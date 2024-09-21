@@ -16,7 +16,7 @@ Add the library to your project gradle dependencies. Make sure to replace `1.0.0
 
 ```kotlin
 dependencies {
-    implementation("com.perracodex:exposed-pagination:1.0.0")
+    implementation("io.github.perracodex:exposed-pagination:1.0.0")
 }
 ```
 

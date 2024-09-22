@@ -89,12 +89,15 @@ mavenPublishing {
 }
 
 signing {
-    val privateKey: String? = System.getenv("SIGNING_SECRET_KEY")
-    val passphrase: String? = System.getenv("SIGNING_PASSPHRASE")
+    val privateKeyPath: String? = System.getenv("MAVEN_SIGNING_KEY_PATH")
+    val passphrase: String? = System.getenv("MAVEN_SIGNING_KEY_PASSPHRASE")
 
-    if (privateKey.isNullOrBlank() || passphrase.isNullOrBlank()) {
-        println("SIGNING_SECRET_KEY or SIGNING_PASSPHRASE is not set. Skipping signing.")
-    } else {
+    if (privateKeyPath.isNullOrBlank())
+        println("MAVEN_SIGNING_KEY_PATH is not set. Skipping signing.")
+    else if (passphrase.isNullOrBlank()) {
+        println("MAVEN_SIGNING_KEY_PASSPHRASE is not set. Skipping signing.")
+    }  else {
+        val privateKey: String = File(privateKeyPath).readText()
         useInMemoryPgpKeys(privateKey, passphrase)
         sign(publishing.publications)
     }

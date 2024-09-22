@@ -1,4 +1,4 @@
-# [Exposed Pagination Library](https://github.com/perracodex/pagination)
+# [Exposed Pagination Library](https://github.com/perracodex/exposed-pagination)
 
 A Kotlin library providing pagination support for the [Exposed](https://github.com/JetBrains/Exposed) ORM framework,
 with integration to the [Ktor](https://ktor.io/) server framework.

@@ -79,6 +79,25 @@ data class Employee(
     }
 }
 ```
+### Integration with Ktor StatusPages plugin
+
+If using the Ktor [StatusPages](https://ktor.io/docs/server-status-pages.html) plugin, you can handle exceptions thrown by the pagination library
+as follows:
+
+```kotlin
+fun Application.configureStatusPages() {
+    install(StatusPages) {
+        exception<PaginationError> { call: ApplicationCall, cause: PaginationError ->
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message = "${cause.errorCode} | ${cause.message} | ${cause.reason ?: ""}"
+            )
+        }
+        
+        // Other exception handlers...
+    }
+}
+```
 
 ## Examples
 

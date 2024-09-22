@@ -1,14 +1,14 @@
 # [Exposed Pagination Library](https://github.com/perracodex/exposed-pagination)
 
 A Kotlin library providing pagination support for the [Exposed](https://github.com/JetBrains/Exposed) ORM framework,
-with integration to the [Ktor](https://ktor.io/) server framework.
+including integration with the [Ktor](https://ktor.io/) server framework.
 ---
 ## Features
 
-- **Easy Pagination**: Apply pagination to your Exposed queries with minimal setup.
+- **Easy Pagination**: Apply pagination to Exposed queries with a single function call.
 - **Sorting Support**: Sort query results based on multiple fields and directions.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
-- **Ktor Integration**: Extract pagination and sorting directives from Ktor requests with a single function call.
+- **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
 
 ---
 ## Installation
@@ -24,7 +24,7 @@ dependencies {
 ---
 ## Usage
 
-- See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html).
+_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
 
 ### Ktor Integration
 
@@ -37,9 +37,9 @@ Whenever receiving a request, use the dedicated extension function to extract pa
 ```kotlin   
 internal fun Route.findAllEmployeesRoute() {
     get("v1/employees") {
-        val pageable: Pageable? = call.getPageable() // Get pagination and sorting information, (if any).
-        val employees: Page<Employee> = EmployeeService.findAll(pageable = pageable)
-        call.respond(status = HttpStatusCode.OK, message = employees)
+        val pageable: Pageable? = call.getPageable() // Get the pagination directives, (if any).
+        val employees: Page<Employee> = EmployeeService.findAll(pageable)
+        call.respond(status = HttpStatusCode.OK, message = employees) // Respond with the paginated results.
     }
 }
 ```
@@ -52,7 +52,7 @@ Use the `paginate` extension function on your Exposed Query to apply pagination.
 import org.jetbrains.exposed.sql.*
 import perracodex.exposed.pagination.paginate
 
-fun findAllEmployees(pageable: Pageable?): Page<Employee> {
+fun findAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
     return transaction {
         EmployeeTable.selectAll()
             .paginate(pageable = pageable, mapper = Employee) // Apply pagination to the query.
@@ -73,7 +73,7 @@ data class Employee(
 ) {
     companion object : IEntityMapper<Employee> { // Implement IEntityMapper interface.
         override fun from(row: ResultRow): Employee {
-            // Map the ResultRow to your entity class as needed.
+            // Map the ResultRow to the entity class as needed.
             return Employee(
                 id = row[EmployeeTable.id],
                 firstName = row[EmployeeTable.firstName],

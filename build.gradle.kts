@@ -5,7 +5,6 @@ import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     `java-library`
-    `maven-publish`
     signing
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.jvm)
@@ -39,12 +38,6 @@ kotlin {
     explicitApi()
 }
 
-// Configure Java to generate sources and Javadoc JARs
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 dependencies {
     implementation(libs.exposed.core)
     implementation(libs.kotlinx.serialization)
@@ -56,6 +49,9 @@ tasks.test {
     useJUnitPlatform()
 }
 
+// https://central.sonatype.com/account
+// https://central.sonatype.com/publishing/deployments
+// https://vanniktech.github.io/gradle-maven-publish-plugin/central/#automatic-release
 mavenPublishing {
     coordinates(
         groupId = group as String,
@@ -88,10 +84,7 @@ mavenPublishing {
         }
     }
 
-    // Configure publishing to Maven Central
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    // Enable GPG signing for all publications
     signAllPublications()
 }
 
@@ -102,7 +95,6 @@ signing {
     if (privateKey.isNullOrBlank() || passphrase.isNullOrBlank()) {
         println("SIGNING_SECRET_KEY or SIGNING_PASSPHRASE is not set. Skipping signing.")
     } else {
-        sign(publishing.publications)
         useInMemoryPgpKeys(privateKey, passphrase)
         sign(publishing.publications)
     }

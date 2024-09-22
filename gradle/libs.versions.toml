@@ -5,7 +5,7 @@
 dokka = "1.9.20"                        # https://github.com/Kotlin/dokka/releases
 exposed = "0.54.0"                      # https://github.com/JetBrains/Exposed/releases
 kotlin = "2.0.20"                       # https://github.com/JetBrains/kotlin/releases
-kotlinx-serialization = "1.7.2"         # https://github.com/Kotlin/kotlinx.serialization/releases/tag/v1.7.2
+kotlinx-serialization = "1.7.3"         # https://github.com/Kotlin/kotlinx.serialization/releases
 ktor = "2.3.12"                         # https://ktor.io/docs/releases.html#release-details
 vanniktech = "0.29.0"                   # https://github.com/vanniktech/gradle-maven-publish-plugin/releases
 
@@ -27,7 +27,7 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "e
 
 # Serialization (part of the pLugin).
 # https://github.com/Kotlin/kotlinx.serialization
-# https://github.com/Kotlin/kotlinx.serialization/releases/tag/v1.7.2
+# https://github.com/Kotlin/kotlinx.serialization/releases
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 # Ktor.

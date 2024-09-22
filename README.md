@@ -10,7 +10,7 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
 
-Note: The library is designed to work with Exposed DSL queries, there is no support DAO:
+Note: The library is designed to work with Exposed DSL queries. There is no support DAO:
 
 ---
 ## Installation

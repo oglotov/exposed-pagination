@@ -10,6 +10,8 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
 
+Note: The library is designed to work with Exposed DSL queries, there is no support DAO:
+
 ---
 ## Installation
 
@@ -35,11 +37,13 @@ Whenever receiving a request, use the dedicated extension function to extract pa
 
 **Example:**
 ```kotlin   
-internal fun Route.findAllEmployeesRoute() {
+import io.perracodex.exposed.pagination.*
+
+fun Route.findAllEmployeesRoute() {
     get("v1/employees") {
         val pageable: Pageable? = call.getPageable() // Get the pagination directives, (if any).
         val employees: Page<Employee> = EmployeeService.findAll(pageable)
-        call.respond(status = HttpStatusCode.OK, message = employees) // Respond with the paginated results.
+        call.respond(status = HttpStatusCode.OK, message = employees) // Respond with a Page object.
     }
 }
 ```
@@ -50,7 +54,7 @@ Use the `paginate` extension function on your Exposed Query to apply pagination.
 
 ```kotlin
 import org.jetbrains.exposed.sql.*
-import perracodex.exposed.pagination.paginate
+import io.perracodex.exposed.pagination.*
 
 fun findAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
     return transaction {
@@ -71,9 +75,9 @@ data class Employee(
     val firstName: String,
     val lastName: String,
 ) {
-    companion object : IEntityMapper<Employee> { // Implement IEntityMapper interface.
+    companion object : IEntityMapper<Employee> { // Implement the IEntityMapper interface.
         override fun from(row: ResultRow): Employee {
-            // Map the ResultRow to the entity class as needed.
+            // Map the ResultRow into the entity (Dto) as needed.
             return Employee(
                 id = row[EmployeeTable.id],
                 firstName = row[EmployeeTable.firstName],

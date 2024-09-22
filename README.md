@@ -2,7 +2,7 @@
 
 A Kotlin library providing pagination support for the [Exposed](https://github.com/JetBrains/Exposed) ORM framework,
 with integration to the [Ktor](https://ktor.io/) server framework.
-
+---
 ## Features
 
 - **Easy Pagination**: Apply pagination to your Exposed queries with minimal setup.
@@ -10,6 +10,7 @@ with integration to the [Ktor](https://ktor.io/) server framework.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination and sorting directives from Ktor requests with a single function call.
 
+---
 ## Installation
 
 Add the library to your project gradle dependencies. Make sure to replace `1.0.0` with the latest version.
@@ -20,7 +21,10 @@ dependencies {
 }
 ```
 
+---
 ## Usage
+
+- See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html).
 
 ### Ktor Integration
 
@@ -99,6 +103,7 @@ fun Application.configureStatusPages() {
 }
 ```
 
+---
 ## Examples
 
 ### Pagination and Sorting
@@ -144,5 +149,6 @@ Example: `sort=employee.firstName,desc`
 `GET` http://localhost:8080/v1/employees?page=0&size=10&sort=employee.firstName,asc&sort=managers.firstName,desc
 ```
 
+---
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -2,7 +2,7 @@
  * Copyright (c) 2024-Present Perracodex. Use of this source code is governed by an MIT license.
  */
 
-package io.perracodex.exposed.pagination
+package io.perracodex.exposed.utils
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

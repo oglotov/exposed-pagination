@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
 /**
  * Holds the data for a page of results.
  *
- * @param details The pagination [Details] that describe the state of the page.
- * @param content The data that forms the content in a page.
+ * @property details The pagination [Details] that describe the state of the page.
+ * @property content The data that forms the content in a page.
  */
 @Serializable
 public data class Page<out T : Any>(

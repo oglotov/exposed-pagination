@@ -75,7 +75,7 @@ data class Employee(
     val firstName: String,
     val lastName: String,
 ) {
-    companion object : IModelMap<Employee> { // Implement the IModelMap interface.
+    companion object : IModelTransform<Employee> { // Implement the IModelTransform interface.
         override fun from(row: ResultRow): Employee {
             // Transform the ResultRow into the domain model as needed.
             return Employee(

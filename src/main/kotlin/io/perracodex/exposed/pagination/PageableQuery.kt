@@ -22,15 +22,15 @@ import org.jetbrains.exposed.sql.ResultRow
  * and a [Page] containing all entities is returned.
  *
  * @param pageable Optional [Pageable] containing pagination and sorting information. If `null`, no pagination is applied.
- * @param mapper Implementation of [IModelMapper] used to convert [ResultRow] instances into domain models of type [T].
+ * @param mapper Implementation of [IModelMap] used to convert [ResultRow] instances into domain models of type [T].
  * @return A [Page] containing the list of mapped domain entities and associated pagination metadata.
  *
  * @see Page
  * @see Pageable
- * @see IModelMapper
+ * @see IModelMap
  * @see Query.paginate
  */
-public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IModelMapper<T>): Page<T> {
+public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IModelMap<T>): Page<T> {
     return this.count().toInt().takeIf { it > 0 }?.let { totalElements ->
         this.paginate(pageable = pageable).map { resultRow ->
             mapper.from(row = resultRow)

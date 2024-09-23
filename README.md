@@ -64,9 +64,9 @@ fun getAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page obje
 }
 ```
 
-### Setting the Query ResultRow Mapper in the Entities
+### Setting the Query ResultRow mapper in the Domain Models
 
-Implement in your domain model companion objects the [IModelMapper](./src/main/kotlin/io/perracodex/exposed/pagination/IModelMapper.kt) interface.
+Implement in your domain model companion objects the [IModelMap](./src/main/kotlin/io/perracodex/exposed/pagination/IModelMap.kt) interface.
 This interface is used by the pagination library to map database ResultRows from a query output to your domain model class.
 
 ```kotlin
@@ -75,7 +75,7 @@ data class Employee(
     val firstName: String,
     val lastName: String,
 ) {
-    companion object : IModelMapper<Employee> { // Implement the IModelMapper interface.
+    companion object : IModelMap<Employee> { // Implement the IModelMap interface.
         override fun from(row: ResultRow): Employee {
             // Map the ResultRow into the domain model as needed.
             return Employee(

@@ -16,8 +16,8 @@ import org.jetbrains.exposed.sql.ResultRow
  *     val firstName: String,
  *     val lastName: String,
  * ) {
- *     // Implement the IModelMapper interface.
- *     companion object : IModelMapper<Employee> {
+ *     // Implement the IModelMap interface.
+ *     companion object : IModelMap<Employee> {
  *         override fun from(row: ResultRow): Employee {
  *             // Map the ResultRow into the domain model as needed.
  *             return Employee(
@@ -32,7 +32,7 @@ import org.jetbrains.exposed.sql.ResultRow
  *
  * @param T The type of the domain model to map to.
  */
-public interface IModelMapper<T> {
+public interface IModelMap<T> {
     /**
      * Transforms a database [ResultRow] into a domain model of type [T].
      *

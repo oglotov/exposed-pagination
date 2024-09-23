@@ -16,10 +16,10 @@ import org.jetbrains.exposed.sql.ResultRow
  *     val firstName: String,
  *     val lastName: String,
  * ) {
- *     // Implement the IModelMap interface.
- *     companion object : IModelMap<Employee> {
+ *     // Implement the IModelTransform interface.
+ *     companion object : IModelTransform<Employee> {
  *         override fun from(row: ResultRow): Employee {
- *             // Map the ResultRow into the domain model as needed.
+ *             // Transform the ResultRow into the domain model as needed.
  *             return Employee(
  *                 id = row[EmployeeTable.id],
  *                 firstName = row[EmployeeTable.firstName],
@@ -30,16 +30,16 @@ import org.jetbrains.exposed.sql.ResultRow
  * }
  *```
  *
- * @param T The type of the domain model to map to.
+ * @param T The type of the domain model to transformed into.
  */
-public interface IModelMap<T> {
+public interface IModelTransform<T> {
     /**
      * Transforms a database [ResultRow] into a domain model of type [T].
      *
      * Implement this method to define how raw database data is converted into the domain model.
      *
      * @param row The [ResultRow] retrieved from a database query.
-     * @return An instance of [T] representing the mapped domain model.
+     * @return An instance of [T] representing the transformed domain model.
      */
     public fun from(row: ResultRow): T
 }

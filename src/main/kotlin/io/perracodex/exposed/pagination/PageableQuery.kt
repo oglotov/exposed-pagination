@@ -10,30 +10,30 @@ import org.jetbrains.exposed.sql.ResultRow
 
 /**
  * Applies pagination to this [Query] based on the specified [pageable] parameters
- * and maps the results to a [Page] of domain entities.
+ * and transforms the results to a [Page] of domain models.
  *
  * This extension function performs the following operations:
  * 1. **Sorting:** If [pageable] includes sorting directives, they are applied to the [Query].
  * 2. **Limiting:** Uses page number and size to set the query’s limit and offset.
- * 3. **Mapping:** Executes the [Query] and maps each [ResultRow] to a domain model of type [T] using the provided [mapper].
- * 4. **Paging Metadata:** Constructs a [Page] object containing the mapped entities along with the pagination details.
+ * 3. **Transforming:** Executes the [Query] and transforms each [ResultRow] to a domain model of type [T].
+ * 4. **Paging Metadata:** Constructs a [Page] object containing the transformed domain models along with the pagination details.
  *
  * If [pageable] is `null`, or the defined page size is `0`, the entire result set is retrieved without any pagination,
- * and a [Page] containing all entities is returned.
+ * and a [Page] containing all domain models is returned.
  *
  * @param pageable Optional [Pageable] containing pagination and sorting information. If `null`, no pagination is applied.
- * @param mapper Implementation of [IModelMap] used to convert [ResultRow] instances into domain models of type [T].
- * @return A [Page] containing the list of mapped domain entities and associated pagination metadata.
+ * @param transform Implementation of [IModelTransform] used to convert [ResultRow] instances into domain models of type [T].
+ * @return A [Page] containing the list of transformed domain models and associated pagination metadata.
  *
  * @see Page
  * @see Pageable
- * @see IModelMap
+ * @see IModelTransform
  * @see Query.paginate
  */
-public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IModelMap<T>): Page<T> {
+public fun <T : Any> Query.paginate(pageable: Pageable?, transform: IModelTransform<T>): Page<T> {
     return this.count().toInt().takeIf { it > 0 }?.let { totalElements ->
         this.paginate(pageable = pageable).map { resultRow ->
-            mapper.from(row = resultRow)
+            transform.from(row = resultRow)
         }.let { content ->
             Page.build(
                 content = content,
@@ -52,7 +52,7 @@ public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IModelMap<T>): 
  * 2. **Limiting:** Uses page number and size to set the query’s limit and offset.
  *
  * If [pageable] is `null`, or the defined page size is `0`, the entire result set is retrieved without any pagination,
- * and a [Page] containing all entities is returned.
+ * and a [Page] containing all domain models is returned.
  *
  * @param pageable Optional [Pageable] containing pagination and sorting information. If `null`, no pagination is applied.
  * @return The modified [Query] with pagination and sorting applied if [pageable] is provided;

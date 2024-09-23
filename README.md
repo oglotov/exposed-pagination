@@ -59,15 +59,15 @@ import io.perracodex.exposed.pagination.*
 fun getAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
     return transaction {
         EmployeeTable.selectAll()
-            .paginate(pageable = pageable, mapper = Employee) // Apply pagination to the query.
+            .paginate(pageable = pageable, transform = Employee) // Apply pagination to the query.
     }
 }
 ```
 
-### Setting the Query ResultRow mapper in the Domain Models
+### Setting the Query ResultRow transform in the Domain Models
 
-Implement in your domain model companion objects the [IModelMap](./src/main/kotlin/io/perracodex/exposed/pagination/IModelMap.kt) interface.
-This interface is used by the pagination library to map database ResultRows from a query output to your domain model class.
+Implement in your domain model companion objects the [IModelTransform](./src/main/kotlin/io/perracodex/exposed/pagination/IModelTransform.kt) interface.
+This interface is used by the pagination library to transform database ResultRows from a query result into domain models.
 
 ```kotlin
 data class Employee(
@@ -77,7 +77,7 @@ data class Employee(
 ) {
     companion object : IModelMap<Employee> { // Implement the IModelMap interface.
         override fun from(row: ResultRow): Employee {
-            // Map the ResultRow into the domain model as needed.
+            // Transform the ResultRow into the domain model as needed.
             return Employee(
                 id = row[EmployeeTable.id],
                 firstName = row[EmployeeTable.firstName],

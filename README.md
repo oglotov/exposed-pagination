@@ -15,11 +15,11 @@ Note: The library is designed to work with Exposed DSL queries. There is no supp
 ---
 ## Installation
 
-Add the library to your project gradle dependencies. Make sure to replace `1.0.0` with the latest version.
+Add the library to your project gradle dependencies. Make sure to replace `1.0.1` with the latest version.
 
 ```kotlin
 dependencies {
-    implementation("io.github.perracodex:exposed-pagination:1.0.0")
+    implementation("io.github.perracodex:exposed-pagination:1.0.1")
 }
 ```
 

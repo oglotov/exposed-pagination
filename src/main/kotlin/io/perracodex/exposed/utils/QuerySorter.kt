@@ -128,7 +128,7 @@ internal object QuerySorter {
      * @param targets A list of [Table] instances to search for the corresponding column.
      * @return The resolved [Column] instance corresponding to the sort directive.
      * @throws PaginationError.InvalidSortDirective If the field specified in the sort directive does not exist in the target tables.
-     * @throws PaginationError.AmbiguousSortField If the field exists in multiple tables without explicit table specification..
+     * @throws PaginationError.AmbiguousSortField If the field exists in multiple tables without explicit table specification.
      *
      * @see Pageable.Sort
      * @see PaginationError

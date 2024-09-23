@@ -6,29 +6,31 @@ package io.perracodex.exposed.pagination
 
 import io.perracodex.exposed.utils.QuerySorter
 import org.jetbrains.exposed.sql.Query
+import org.jetbrains.exposed.sql.ResultRow
 
 /**
- * Extension function to apply pagination to a database [Query] based on the provided [pageable] directives,
- * and map the results to a list of entities using the provided [mapper].
+ * Applies pagination to this [Query] based on the specified [pageable] parameters
+ * and maps the results to a [Page] of domain entities.
  *
- * If [pageable] is not null, it first applies the chosen sorting order (if included in pageable),
- * then calculates the start index based on the page number and size, and finally applies these as
- * limits to the query.
+ * This extension function performs the following operations:
+ * 1. **Sorting:** If [pageable] includes sorting directives, they are applied to the [Query].
+ * 2. **Limiting:** Uses page number and size to set the query’s limit and offset.
+ * 3. **Mapping:** Executes the [Query] and maps each [ResultRow] to a domain model of type [T] using the provided [mapper].
+ * 4. **Paging Metadata:** Constructs a [Page] object containing the mapped entities along with the pagination details.
  *
- * If the page size is zero, no limit is applied, and all records are returned.
+ * If [pageable] is `null`, or the defined page size is `0`, the entire result set is retrieved without any pagination,
+ * and a [Page] containing all entities is returned.
  *
- * If [pageable] is null, no pagination is applied, and a [Page] with the query results is returned.
- *
- * @param pageable An optional [Pageable] object containing pagination information.
- * @param mapper The [IEntityMapper] to use to map the query results to entities.
- * @return The [Page] of entities mapped from the query results.
+ * @param pageable Optional [Pageable] containing pagination and sorting information. If `null`, no pagination is applied.
+ * @param mapper Implementation of [IModelMapper] used to convert [ResultRow] instances into domain models of type [T].
+ * @return A [Page] containing the list of mapped domain entities and associated pagination metadata.
  *
  * @see Page
  * @see Pageable
- * @see IEntityMapper
+ * @see IModelMapper
  * @see Query.paginate
  */
-public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IEntityMapper<T>): Page<T> {
+public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IModelMapper<T>): Page<T> {
     return this.count().toInt().takeIf { it > 0 }?.let { totalElements ->
         this.paginate(pageable = pageable).map { resultRow ->
             mapper.from(row = resultRow)
@@ -43,18 +45,18 @@ public fun <T : Any> Query.paginate(pageable: Pageable?, mapper: IEntityMapper<T
 }
 
 /**
- * Extension function to apply pagination to a database [Query] based on the provided [pageable] directives.
+ * Applies pagination directives to this [Query] based on the provided [pageable] parameters.
  *
- * If [pageable] is not null, it first applies the chosen sorting order (if included in pageable),
- * then calculates the start index based on the page number and size, and finally applies these as
- * limits to the query.
+ * This extension function modifies the query in the following ways:
+ * 1. **Sorting:** If [pageable] includes sorting directives, they are applied to the [Query].
+ * 2. **Limiting:** Uses page number and size to set the query’s limit and offset.
  *
- * If the page size is zero, no limit is applied, and all records are returned.
+ * If [pageable] is `null`, or the defined page size is `0`, the entire result set is retrieved without any pagination,
+ * and a [Page] containing all entities is returned.
  *
- * If [pageable] is null, the original query is returned unchanged.
- *
- * @param pageable An optional [Pageable] object containing pagination information.
- * @return The [Query] with pagination applied if [pageable] is provided, otherwise the original Query.
+ * @param pageable Optional [Pageable] containing pagination and sorting information. If `null`, no pagination is applied.
+ * @return The modified [Query] with pagination and sorting applied if [pageable] is provided;
+ * otherwise, the original [Query] is returned unaltered.
  *
  * @see Pageable
  */

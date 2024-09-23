@@ -14,25 +14,47 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.full.memberProperties
 
 /**
- * Handles the determination and application of column-based ordering
- * for database [Query] instances.
+ * Responsible for determining and applying column-based ordering to database [Query] instances.
+ *
+ * It handles the resolution of columns across multiple tables, manages caching for performance optimization,
+ * and ensures that sorting directives are applied unambiguously.
+ *
+ * **Key Responsibilities:**
+ * - **Sorting Application:** Applies multiple sorting directives to a [Query].
+ * - **Column Resolution:** Resolves column references from sorting directives, handling ambiguities.
+ * - **Caching:** Utilizes a cache to manage column references, minimizing the overhead of reflection-based resolution.
+ *
+ * @see Pageable.Sort
+ * @see Query
+ * @see PaginationError
  */
 internal object QuerySorter {
     private val tracer = Tracer<QuerySorter>()
 
     /**
-     * Cache storing column references.
-     * Used to optimize the reflection process of finding table columns.
+     * A cache that stores resolved column references to optimize column lookup operations.
+     *
+     * This cache maps a unique key, generated based on query tables and sorting directives,
+     * to their corresponding [Column] instances. By caching these references, the [QuerySorter]
+     * minimizes the performance cost associated with reflection-based column resolution.
      *
      * @see generateCacheKey
      */
     private val columnCache: MutableMap<String, Column<*>> = ConcurrentHashMap()
 
     /**
-     * Applies ordering to a query based on the provided list of [Pageable.Sort] directives.
+     * Applies the specified sorting directives to the given [Query], by processing
+     * each [Pageable.Sort] directive, resolves the corresponding [Column] within
+     * the context of the query's tables, and applies the sorting order to the [Query].
      *
-     * @param query The query to apply ordering to.
-     * @param sortDirectives The list of sorting directives to apply to the query.
+     * @param query The [Query] instance to which the sorting directives will be applied.
+     * @param sortDirectives A list of [Pageable.Sort] directives defining the sorting order.
+     * @throws PaginationError.InvalidSortDirective If a sort directive references a non-existent field or table.
+     * @throws PaginationError.AmbiguousSortField If a sort directive's field is found in multiple tables
+     * without explicit table specification.
+     *
+     * @see Pageable.Sort
+     * @see PaginationError
      */
     fun applyOrder(query: Query, sortDirectives: List<Pageable.Sort>) {
         if (sortDirectives.isEmpty()) {
@@ -64,14 +86,21 @@ internal object QuerySorter {
     }
 
     /**
-     * Filters the list of query tables needed to resolve the field from the sort directive.
+     * Identifies the target tables within the [Query] that correspond to a given [sort] directive.
      *
-     * If a table name is provided in the sort directive, only tables with a matching name are returned.
-     * If no table name is provided, all query tables are returned as potential targets.
+     * This method filters the list of tables involved in the query based on the table name
+     * specified in the [Pageable.Sort] directive. If a table name is provided, it selects
+     * only the table that matches the specified name. If no table name is specified,
+     * it returns all tables involved in the [Query].
      *
-     * @param queryTables The list of tables involved in the query.
-     * @param sort The sorting directive containing the table name.
-     * @return The list of target tables based on the sort directive.
+     * @param queryTables The list of all the [Table] instances involved in the current [Query].
+     * @param sort The [Pageable.Sort] directive containing the table name (if any) and field name.
+     *
+     * @return A list of [Table] objects that match the sorting directive's table name, or all tables if none is specified.
+     * @throws PaginationError.InvalidSortDirective If the specified table name does not exist within the query's tables.
+     *
+     * @see Pageable.Sort
+     * @see PaginationError
      */
     private fun findTargetTables(queryTables: List<Table>, sort: Pageable.Sort): List<Table> {
         return sort.table?.let { tableName ->
@@ -87,13 +116,22 @@ internal object QuerySorter {
     }
 
     /**
-     * Attempts to retrieve a column, first from the cache, or of not found, try to resolve
-     * it via reflection from the given list of table [targets] and cache it.
+     * Attempts to retrieve the [Column] associated with a sorting directive, utilizing caching for efficiency.
      *
-     * @param key The cache key to retrieve/store the column reference.
-     * @param sort The sorting directive containing the field name.
-     * @param targets A list of tables to search for the column.
-     * @return The found Column reference, or null if not found.
+     * This method first attempts to fetch the [Column] from the [columnCache] using the provided key.
+     * If the column is not cached, it resolves the column through reflection by searching the target
+     * tables for a matching field name. Upon successful resolution, the column is cached for future
+     * retrievals.
+     *
+     * @param key A unique string key generated from the query tables and sort directive.
+     * @param sort The [Pageable.Sort] directive containing the field name and sort direction.
+     * @param targets A list of [Table] instances to search for the corresponding column.
+     * @return The resolved [Column] instance corresponding to the sort directive.
+     * @throws PaginationError.InvalidSortDirective If the field specified in the sort directive does not exist in the target tables.
+     * @throws PaginationError.AmbiguousSortField If the field exists in multiple tables without explicit table specification..
+     *
+     * @see Pageable.Sort
+     * @see PaginationError
      */
     private fun getColumn(key: String, sort: Pageable.Sort, targets: List<Table>): Column<*> {
         // Check if the column is already cached, and return it if found.
@@ -122,12 +160,21 @@ internal object QuerySorter {
     }
 
     /**
-     * Searches for a column in the given [table] by matching its property names
-     * with the given [fieldName].
+     * Resolves a [Column] within a specific [Table] based on the provided field name,
+     * by using reflection to search for a property within the [Table] class that matches
+     * the specified [fieldName]. It filters properties to identify those that are of type [Column]
+     * and have a name matching the field name (case-insensitive).
      *
-     * @param table The table to search for the column.
-     * @param fieldName The name of the field representing the column.
-     * @return List of Column references from the table that match the field name.
+     * Using the Table class properties to resolve the columns instead of the actual table field name
+     * at database level, allows to abstract clients from the actual database field name definition,
+     * which could be different from the property name in the Table class.
+     *
+     * @param table The [Table] in which to search for the column.
+     * @param fieldName The name of the field representing the column to be resolved.
+     * @return A list of [Column] instances that match the specified field name within the table.
+     *
+     * **Note:** Typically, this list should contain either zero or one [Column]. Multiple matches indicate
+     * a configuration issue where multiple columns share the same field name within a table.
      */
     private fun resolveTableColumn(table: Table, fieldName: String): List<Column<*>> {
         return table::class.memberProperties.filter { property ->
@@ -147,19 +194,20 @@ internal object QuerySorter {
     }
 
     /**
-     * Generates a unique cache key for column lookup by combining all table names involved in the query
-     * with the specified sorting directives.
+     * Generates a unique cache key based on the [Query] tables and a [Pageable.Sort] directive.
      *
-     * If the sorting table name is not specified in the directives, it defaults to `null`, maintaining uniqueness.
-     * This design allows caching the same column under two keys to optimize column retrieval,
-     * as long as no ambiguity is detected (e.g., `query-tables=null.fieldName` or `query-tables=tableName.fieldName`).
+     * The cache key is constructed by concatenating the names of all tables involved in the [Query],
+     * followed by the table name (if specified) the field belongs to, and finally the field name.
+     * This unique key ensures that cached columns are associated only with their respective query
+     * contexts and sorting criteria.
      *
-     * This approach prevents skipping essential ambiguity checks for fields that appear across different
-     * tables in different queries.
+     * **Example Key Format:**
+     * - With table specified: `"employees::departments::contracts=employees.firstName"`
+     * - Without table specified: `"employees::departments::contracts=firstName"`
      *
-     * @param queryTables All the tables involved in the query.
-     * @param sort The sorting directive used to refine the key.
-     * @return A string representing the cache key, uniquely identifying a column within the query context.
+     * @param queryTables The list of [Table] objects involved in the [Query].
+     * @param sort The [Pageable.Sort] directive containing the table name (optional) and field name.
+     * @return A unique string key representing the combination of query tables and sorting directive.
      */
     private fun generateCacheKey(queryTables: List<Table>, sort: Pageable.Sort): String {
         val tableNames: String = queryTables.joinToString("::") { it.tableName.lowercase() }

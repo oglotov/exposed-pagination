@@ -8,11 +8,11 @@ import io.perracodex.exposed.pagination.Pageable.Sort
 import kotlinx.serialization.Serializable
 
 /**
- * Input parameters for pagination.
+ * Encapsulates the parameters required to request a specific page of data from a paginated dataset.
  *
- * @property page The 0-based page index.
- * @property size The size of the page to be returned. 0 means all elements.
- * @property sort The optional [Sort] order to apply to the results.
+ * @property page The zero-based index of the page to retrieve.
+ * @property size The maximum number of elements to include in a single page. `0` to return all elements without pagination.
+ * @property sort An optional list of [Sort] directives to order the results.
  */
 @Serializable
 public data class Pageable(
@@ -37,11 +37,11 @@ public data class Pageable(
     }
 
     /**
-     * Sorting order for a field.
+     * Specifies the sorting order for a particular field within the dataset.
      *
-     * @property table Optional name of the table the field belongs to. Used to avoid ambiguity.
+     * @property table Optional name of the table that the field belongs to. Used to find ambiguities in multi-table queries.
      * @property field The name of the field to sort by.
-     * @property direction The direction of the sorting.
+     * @property direction The [Direction] in which to sort the field.
      */
     @Serializable
     public data class Sort(

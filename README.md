@@ -39,7 +39,7 @@ Whenever receiving a request, use the dedicated extension function to extract pa
 ```kotlin   
 import io.perracodex.exposed.pagination.*
 
-fun Route.findAllEmployeesRoute() {
+fun Route.findAllEmployees() {
     get("v1/employees") {
         val pageable: Pageable? = call.getPageable() // Get the pagination directives, (if any).
         val employees: Page<Employee> = EmployeeService.findAll(pageable)
@@ -56,7 +56,7 @@ Use the `paginate` extension function on your Exposed Query to apply pagination.
 import org.jetbrains.exposed.sql.*
 import io.perracodex.exposed.pagination.*
 
-fun findAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
+fun getAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
     return transaction {
         EmployeeTable.selectAll()
             .paginate(pageable = pageable, mapper = Employee) // Apply pagination to the query.
@@ -66,8 +66,8 @@ fun findAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page obj
 
 ### Setting the Query ResultRow Mapper in the Entities
 
-Implement in your entity companion objects the [EntityMapper](./src/main/kotlin/io/perracodex/exposed/pagination/IEntityMapper.kt) interface.
-This interface is used by the pagination library to map database ResultRows from a query output to your entity class.
+Implement in your domain model companion objects the [IModelMapper](./src/main/kotlin/io/perracodex/exposed/pagination/IModelMapper.kt) interface.
+This interface is used by the pagination library to map database ResultRows from a query output to your domain model class.
 
 ```kotlin
 data class Employee(
@@ -75,9 +75,9 @@ data class Employee(
     val firstName: String,
     val lastName: String,
 ) {
-    companion object : IEntityMapper<Employee> { // Implement the IEntityMapper interface.
+    companion object : IModelMapper<Employee> { // Implement the IModelMapper interface.
         override fun from(row: ResultRow): Employee {
-            // Map the ResultRow into the entity (Dto) as needed.
+            // Map the ResultRow into the domain model as needed.
             return Employee(
                 id = row[EmployeeTable.id],
                 firstName = row[EmployeeTable.firstName],

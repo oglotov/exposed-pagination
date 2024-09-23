@@ -8,10 +8,13 @@ import io.perracodex.exposed.pagination.Page.Details
 import kotlinx.serialization.Serializable
 
 /**
- * Holds the data for a page of results.
+ * Represents a single page of results within a paginated dataset,
+ * encapsulating both the data content for a concrete page and metadata
+ * about the pagination state.
  *
- * @property details The pagination [Details] that describe the state of the page.
- * @property content The data that forms the content in a page.
+ * @param T The type of elements contained within the page.
+ * @property details Metadata providing [Details] about the pagination state, such as total pages and current page index.
+ * @property content The list of elements of type [T] contained in the page.
  */
 @Serializable
 public data class Page<out T : Any>(
@@ -19,23 +22,19 @@ public data class Page<out T : Any>(
     val content: List<T>,
 ) {
     /**
-     * The [Page] details that describe the pagination state.
+     * Contains metadata describing the state and configuration of a paginated [Page].
      *
-     * Set as a separate data class to simplify the OpenAPI documentation,
-     * so each generated Page specification per its concrete type does not
-     * have to include the entire Page details attributes.
-     *
-     * @property totalPages The total number of pages available based on the pagination settings.
-     * @property pageIndex The current page number, 0-based.
-     * @property totalElements Total number of elements in the entire dataset, not just a page.
-     * @property elementsPerPage The number of elements per each page.
-     * @property elementsInPage The number of elements in the current page.
-     * @property isFirst True if serving the first page.
-     * @property isLast True if serving the last page.
-     * @property hasNext True if there is a next page.
-     * @property hasPrevious True if there is a previous page.
-     * @property isOverflow Whether the requested page index is above the total available pages.
-     * @property sort The optional sorting that has been applied to the content.
+     * @property totalPages The total number of pages available based on the pagination parameters.
+     * @property pageIndex The zero-based index of the current page.
+     * @property totalElements The aggregate number of elements across all pages.
+     * @property elementsPerPage The maximum number of elements that can be contained in a single page.
+     * @property elementsInPage The actual number of elements present in the current page.
+     * @property isFirst Indicates whether the current page is the first one.
+     * @property isLast Indicates whether the current page is the last one.
+     * @property hasNext Indicates if there is a subsequent page available after the current one.
+     * @property hasPrevious Indicates if there is a preceding page before the current one.
+     * @property isOverflow Indicates whether the requested page index exceeds the total number of available pages.
+     * @property sort The sorting criteria applied to the elements within the page, if any.
      */
     @Serializable
     public data class Details(
@@ -54,12 +53,12 @@ public data class Page<out T : Any>(
 
     public companion object {
         /**
-         * Factory method to create a new [Page] instance.
+         *  Factory method to construct a new [Page] instance with the specified content and pagination parameters.
          *
-         * @param content The list of object data for the page.
-         * @param totalElements The total number of elements in the entire dataset, not just the page.
-         * @param pageable The pagination information that was used to request the content, or null if none was used.
-         * @return A new [Page] instance with the given [content], including a computed page details.
+         * @param content The list of elements to include in the current page.
+         * @param totalElements The total count of elements across all pages.
+         * @param pageable The [Pageable] settings used to retrieve the content. `null` if no pagination was applied.
+         * @return A [Page] containing the specified [content] and corresponding pagination [Details].
          */
         public fun <T : Any> build(content: List<T>, totalElements: Int, pageable: Pageable?): Page<T> {
             // Set default page size.
@@ -107,10 +106,11 @@ public data class Page<out T : Any>(
         }
 
         /**
-         * Factory method to create a new [Page] instance with an empty content list.
+         * Factory method to create an empty [Page] instance with no content.
+         * Useful for scenarios where a query returns no results but pagination metadata is still required.
          *
-         * @param pageable The pagination information that was used to request the content, or null if none was used.
-         * @return A new [Page] instance with an empty content list and computed page details.
+         * @param pageable The [Pageable] settings that were applied to the query, or `null` if no pagination was used.
+         * @return An empty [Page] with appropriate pagination [Details].
          */
         public fun <T : Any> empty(pageable: Pageable?): Page<T> {
             return build(content = emptyList(), totalElements = 0, pageable = pageable)

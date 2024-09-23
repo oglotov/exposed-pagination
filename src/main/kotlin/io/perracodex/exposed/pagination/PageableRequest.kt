@@ -9,39 +9,45 @@ import io.ktor.server.application.*
 import io.perracodex.exposed.utils.SortParameterParser
 
 /**
- * Extension function to construct a [Pageable] instance from [ApplicationCall] request parameters.
+ * Creates a [Pageable] instance by extracting pagination and sorting parameters from the [ApplicationCall] request.
  *
- * Pagination parameters:
- * - 'page': The index of the page requested (0-based). If not provided, defaults to 0.
- * - 'size': The number of items per page. If not provided, defaults to 0, indicating no pagination.
+ * **Pagination Parameters:**
+ * - **`page`**: The zero-based index of the requested page.
+ * - **`size`**: The number of elements per page. `0` if all elements should be returned without pagination.
  *
- * Sorting parameters:
- * - 'sort': A list of strings indicating the fields to sort by and their directions. Each string
- *           should follow the format "fieldName,direction". If 'direction' is omitted, ascending
- *           order is assumed. Multiple 'sort' parameters can be provided for multi-field sorting.
+ * **Sorting Parameters:**
+ * - **`sort`**: A list of strings defining the sorting criteria. Format `"fieldName,direction"`, where:
+ *      - **`fieldName`**: The name of the field to sort by.
+ *      - **`direction`** (optional): The sorting direction, If omitted, ascending order is assumed.
+ *      - Multiple `sort` parameters can be provided to apply multi-field sorting.
  *
- * A [PaginationError.InvalidPageablePair] is raised if only one pagination parameter
- * ('page' or 'size') is provided without the other.
- * Similarly, a [PaginationError.InvalidOrderDirection] is raised if an invalid direction is
- * specified in any 'sort' parameter.
+ * **Sorting Logic for Multiple Tables:**
+ * - To avoid ambiguity in queries involving multiple tables, sorting fields can be prefixed with the table name: `"tableName.fieldName"`.
+ * - If a sorting field includes a table prefix (e.g., `"employees.firstName"`), the sort is applied specifically to that table's field.
+ * - If a field name without a table prefix is used, and it causes ambiguity due to duplicate field names across tables in the
+ *   target query, an exception is thrown. It is recommended to always use table-prefixed field names in such scenarios.
  *
- * The sorting logic accommodates scenarios involving multiple tables. If the sorting field specification
- * includes a table name (denoted by a field name prefixed with the table name and separated by a dot,
- * like "table.fieldName"), the sorting is applied specifically to the identified table and field.
- * This explicit specification prevents ambiguity and ensures accurate sorting when queries involve
- * multiple tables with potentially overlapping field names.
+ * **Sample Usage:**
  *
- * If the field name does not include a table prefix, and ambiguity arises due to multiple tables
- * sharing the same field name, an exception is raised. To avoid this, it is recommended to prefix
- * field names with table names for clarity and precision.
+ * ```
+ * fun Route.findAllEmployees() {
+ *     get("v1/employees") {
+ *          // Get the pagination directives, (if any).
+ *         val pageable: Pageable? = call.getPageable()
+ *         // Utilize the pageable object to retrieve a page of employees.
+ *         val employees: Page<Employee> = EmployeeService.findAll(pageable)
+ *         // Respond with a Page object.
+ *         call.respond(status = HttpStatusCode.OK, message = employees)
+ *     }
+ * }
+ * ```
  *
- * If no pagination or sorting is requested, the function returns null, indicating the absence of
- * pageable constraints.
+ * @return A [Pageable] instance containing pagination information extracted from the request. `null` if no parameters were provided.
+ * @throws PaginationError.InvalidPageablePair If only one of the pagination parameters (`page` or `size`) is provided.
+ * @throws PaginationError.InvalidOrderDirection If any provided sort direction is invalid.
  *
- * @return A [Pageable] object containing the pagination and sorting configuration derived from the
- *         request's parameters, or null if no pagination or sorting is requested.
- * @throws PaginationError.InvalidPageablePair if pagination parameters are incomplete.
- * @throws PaginationError.InvalidOrderDirection if a sorting direction is invalid.
+ * @see Pageable
+ * @see PaginationError
  */
 public fun ApplicationCall.getPageable(): Pageable? {
     val parameters: Parameters = request.queryParameters

@@ -5,24 +5,27 @@
 package io.perracodex.exposed.pagination
 
 /**
- * Pagination concrete errors.
+ * Represents various errors that can occur during pagination operations.
  *
- * @param errorCode A unique code identifying the type of error.
- * @param description A human-readable description of the error.
- * @param reason An optional human-readable reason for the exception, providing more context.
- * @param cause The underlying cause of the exception, if any.
+ * @property errorCode A unique identifier for the specific type of pagination error.
+ * @property description A clear and concise message describing the error.
+ * @property reason An optional detailed explanation providing additional context for the error.
+ * @property cause The underlying exception that triggered this pagination error, if any.
  */
 public sealed class PaginationError(
     public val errorCode: String,
-    description: String,
+    public val description: String,
     public val reason: String? = null,
     cause: Throwable? = null
 ) : Exception(description, cause) {
     /**
-     * Error when provided sorting fields are ambiguous as they may exist in multiple tables.
+     * Indicates that a provided sorting field is ambiguous because it exists in multiple tables.
      *
-     * @param sort The sort directive that was provided.
-     * @param reason Optional human-readable reason for the exception, providing more context.
+     * This error is thrown when the sorting directive does not specify a table prefix for a field
+     * that exists in more than one table involved in the query, leading to ambiguity in sorting.
+     *
+     * @param sort The [Pageable.Sort] directive that caused the ambiguity.
+     * @param reason A detailed explanation of why the sort field is considered ambiguous.
      */
     public class AmbiguousSortField(sort: Pageable.Sort, reason: String) : PaginationError(
         errorCode = "AMBIGUOUS_SORT_FIELD",
@@ -31,39 +34,35 @@ public sealed class PaginationError(
     )
 
     /**
-     * Error when the page attributes are invalid.
-     * This is when only one either the page or size is present.
-     * Both must be present or none of them.
+     * Indicates that only one of the pagination parameters ('page' or 'size') was provided.
      *
-     * @param reason Optional human-readable reason for the exception, providing more context.
-     * @param cause Optional underlying cause of the exception, if any.
+     * Both 'page' and 'size' must be present to perform pagination.
+     * Providing only one leads to an incomplete pagination request.
      */
-    public class InvalidPageablePair(reason: String? = null, cause: Throwable? = null) : PaginationError(
+    public class InvalidPageablePair : PaginationError(
         errorCode = "INVALID_PAGEABLE_PAIR",
         description = "Page attributes mismatch. Expected both 'page' and 'size', or none of them.",
-        reason = reason,
-        cause = cause
     )
 
     /**
-     * Error when the provided sort direction is invalid.
+     * Indicates that an invalid sorting direction was specified in a sort directive.
      *
-     * @param direction The sort direction that was provided is not valid.
-     * @param reason Optional human-readable reason for the exception, providing more context.
-     * @param cause Optional underlying cause of the exception, if any.
+     * This error is thrown when the direction specified in a sorting parameter is unknown.
+     *
+     * @param direction The invalid sort direction that was provided.
      */
-    public class InvalidOrderDirection(direction: String, reason: String? = null, cause: Throwable? = null) : PaginationError(
+    public class InvalidOrderDirection(direction: String) : PaginationError(
         errorCode = "INVALID_ORDER_DIRECTION",
         description = "Ordering sort direction is invalid. Received: '$direction'",
-        reason = reason,
-        cause = cause
     )
 
     /**
-     * Error when provided sorting field is invalid.
+     * Indicates that a sort directive provided is not recognized.
      *
-     * @param sort The sort directive that was provided.
-     * @param reason Optional human-readable reason for the exception, providing more context.
+     * This error is thrown when trying to sort by a field that is not part of the query.
+     *
+     * @param sort The [Pageable.Sort] directive that is invalid.
+     * @param reason A detailed explanation of why the sort directive is considered invalid.
      */
     public class InvalidSortDirective(sort: Pageable.Sort, reason: String) : PaginationError(
         errorCode = "INVALID_SORT_DIRECTIVE",
@@ -72,8 +71,9 @@ public sealed class PaginationError(
     )
 
     /**
-     * Error when the provided sort directive is missing.
-     * So, that no field name was specified.
+     * Indicates that a sort directive was provided without specifying a field name.
+     *
+     * This error is thrown when a sort parameter is present but does not include a field to sort by.
      */
     public class MissingSortDirective : PaginationError(
         errorCode = "MISSING_SORT_DIRECTIVE",

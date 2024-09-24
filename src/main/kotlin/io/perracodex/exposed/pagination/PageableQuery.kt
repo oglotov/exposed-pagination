@@ -25,10 +25,10 @@ import org.jetbrains.exposed.sql.ResultRow
  * @param transform Implementation of [IModelTransform] used to convert [ResultRow] instances into domain models of type [T].
  * @return A [Page] containing the list of transformed domain models and associated pagination metadata.
  *
- * @see Page
- * @see Pageable
- * @see IModelTransform
- * @see Query.paginate
+ * @see [Page]
+ * @see [Pageable]
+ * @see [IModelTransform]
+ * @see [Query.paginate]
  */
 public fun <T : Any> Query.paginate(pageable: Pageable?, transform: IModelTransform<T>): Page<T> {
     return this.count().toInt().takeIf { it > 0 }?.let { totalElements ->
@@ -58,7 +58,7 @@ public fun <T : Any> Query.paginate(pageable: Pageable?, transform: IModelTransf
  * @return The modified [Query] with pagination and sorting applied if [pageable] is provided;
  * otherwise, the original [Query] is returned unaltered.
  *
- * @see Pageable
+ * @see [Pageable]
  */
 public fun Query.paginate(pageable: Pageable?): Query {
     pageable?.let {

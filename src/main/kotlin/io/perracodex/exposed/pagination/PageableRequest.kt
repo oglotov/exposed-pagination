@@ -46,8 +46,8 @@ import io.perracodex.exposed.utils.SortParameterParser
  * @throws PaginationError.InvalidPageablePair If only one of the pagination parameters (`page` or `size`) is provided.
  * @throws PaginationError.InvalidOrderDirection If any provided sort direction is invalid.
  *
- * @see Pageable
- * @see PaginationError
+ * @see [Pageable]
+ * @see [PaginationError]
  */
 public fun ApplicationCall.getPageable(): Pageable? {
     val parameters: Parameters = request.queryParameters

@@ -24,9 +24,9 @@ import kotlin.reflect.full.memberProperties
  * - **Column Resolution:** Resolves column references from sorting directives, handling ambiguities.
  * - **Caching:** Utilizes a cache to manage column references, minimizing the overhead of reflection-based resolution.
  *
- * @see Pageable.Sort
- * @see Query
- * @see PaginationError
+ * @see [Pageable.Sort]
+ * @see [Query]
+ * @see [PaginationError]
  */
 internal object QuerySorter {
     private val tracer = Tracer<QuerySorter>()
@@ -38,7 +38,7 @@ internal object QuerySorter {
      * to their corresponding [Column] instances. By caching these references, the [QuerySorter]
      * minimizes the performance cost associated with reflection-based column resolution.
      *
-     * @see generateCacheKey
+     * @see [generateCacheKey]
      */
     private val columnCache: MutableMap<String, Column<*>> = ConcurrentHashMap()
 
@@ -53,8 +53,8 @@ internal object QuerySorter {
      * @throws PaginationError.AmbiguousSortField If a sort directive's field is found in multiple tables
      * without explicit table specification.
      *
-     * @see Pageable.Sort
-     * @see PaginationError
+     * @see [Pageable.Sort]
+     * @see [PaginationError]
      */
     fun applyOrder(query: Query, sortDirectives: List<Pageable.Sort>) {
         if (sortDirectives.isEmpty()) {
@@ -99,8 +99,8 @@ internal object QuerySorter {
      * @return A list of [Table] objects that match the sorting directive's table name, or all tables if none is specified.
      * @throws PaginationError.InvalidSortDirective If the specified table name does not exist within the query's tables.
      *
-     * @see Pageable.Sort
-     * @see PaginationError
+     * @see [Pageable.Sort]
+     * @see [PaginationError]
      */
     private fun findTargetTables(queryTables: List<Table>, sort: Pageable.Sort): List<Table> {
         return sort.table?.let { tableName ->
@@ -130,8 +130,8 @@ internal object QuerySorter {
      * @throws PaginationError.InvalidSortDirective If the field specified in the sort directive does not exist in the target tables.
      * @throws PaginationError.AmbiguousSortField If the field exists in multiple tables without explicit table specification.
      *
-     * @see Pageable.Sort
-     * @see PaginationError
+     * @see [Pageable.Sort]
+     * @see [PaginationError]
      */
     private fun getColumn(key: String, sort: Pageable.Sort, targets: List<Table>): Column<*> {
         // Check if the column is already cached, and return it if found.

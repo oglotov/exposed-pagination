@@ -2,19 +2,20 @@
 
 A Kotlin library providing pagination support for the [Exposed](https://github.com/JetBrains/Exposed) ORM framework,
 including integration with the [Ktor](https://ktor.io/) server framework.
----
-## Features
 
+---
+
+### Features
 - **Easy Pagination**: Apply pagination to Exposed queries with a single function call.
 - **Sorting Support**: Sort query results based on multiple fields and directions.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
 
-Note: The library is designed to work with Exposed DSL queries. There is no support DAO:
+**Note: The library is designed to work with Exposed DSL queries. There is no support DAO:**
 
 ---
-## Installation
 
+### Installation
 Add the library to your project gradle dependencies. Make sure to replace `1.0.1` with the latest version.
 
 ```kotlin
@@ -24,7 +25,8 @@ dependencies {
 ```
 
 ---
-## Usage
+
+### Usage
 
 _See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
 
@@ -48,7 +50,7 @@ fun Route.findAllEmployees() {
 }
 ```
 
-### Applying Pagination to Queries
+#### Applying Pagination to Queries
 
 Use the `paginate` extension function on your Exposed Query to apply pagination.
 
@@ -64,7 +66,7 @@ fun getAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page obje
 }
 ```
 
-### Setting the Query ResultRow transform in the Domain Models
+#### Setting the Query ResultRow transform in the Domain Models
 
 Implement in your domain model companion objects the [IModelTransform](./src/main/kotlin/io/perracodex/exposed/pagination/IModelTransform.kt) interface.
 This interface is used by the pagination library to transform database ResultRows from a query result into domain models.
@@ -87,7 +89,7 @@ data class Employee(
     }
 }
 ```
-### Integration with Ktor StatusPages plugin
+#### Integration with Ktor StatusPages plugin
 
 If using the Ktor [StatusPages](https://ktor.io/docs/server-status-pages.html) plugin, you can handle exceptions thrown by the pagination library
 as follows:
@@ -108,13 +110,10 @@ fun Application.configureStatusPages() {
 ```
 
 ---
-## Examples
 
-### Pagination and Sorting
+### Syntax
 
 You can use HTTP query parameters to control pagination and sorting in your API endpoints.
-
-### Syntax for pagination and sorting:
 
 - **Pagination:** `?page=0&size=10`
 
@@ -124,7 +123,10 @@ You can use HTTP query parameters to control pagination and sorting in your API 
 
 **Note:** If no sort directive is specified, it will default to `ASC`.
 
+--- 
+
 ### Samples:
+
 Page 0, 10 elements per page:
 ```bash
 GET http://localhost:8080/v1/employees?page=0&size=10
@@ -142,17 +144,20 @@ No pagination, sorted by first name, default to ascending:
 `GET` http://localhost:8080/v1/employees?sort=firstName
 ```
 
-### Resolving Ambiguity
+---
+
+### Resolving Field Ambiguity
 
 To avoid ambiguity when sorting by multiple fields sharing the same name across different tables,
 the field name can be prefixed with the table name separated by a dot.
 
-Example: `sort=employee.firstName,desc`
+Syntax: `sort=tableName.fieldName,asc`
 
 ```bash
 `GET` http://localhost:8080/v1/employees?page=0&size=10&sort=employee.firstName,asc&sort=managers.firstName,desc
 ```
 
 ---
-## License
+
+### License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

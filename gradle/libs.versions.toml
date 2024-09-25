@@ -3,7 +3,7 @@
 [versions]
 
 dokka = "1.9.20"                        # https://github.com/Kotlin/dokka/releases
-exposed = "0.54.0"                      # https://github.com/JetBrains/Exposed/releases
+exposed = "0.55.0"                      # https://github.com/JetBrains/Exposed/releases
 kotlin = "2.0.20"                       # https://github.com/JetBrains/kotlin/releases
 kotlinx-serialization = "1.7.3"         # https://github.com/Kotlin/kotlinx.serialization/releases
 ktor = "2.3.12"                         # https://ktor.io/docs/releases.html#release-details

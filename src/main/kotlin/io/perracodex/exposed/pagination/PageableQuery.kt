@@ -68,7 +68,8 @@ public fun Query.paginate(pageable: Pageable?): Query {
 
         if (pageable.size > 0) {
             val startIndex: Int = pageable.page * pageable.size
-            this.limit(n = pageable.size, offset = startIndex.toLong())
+            this.limit(count = pageable.size)
+                .offset(start = startIndex.toLong())
         }
     }
 

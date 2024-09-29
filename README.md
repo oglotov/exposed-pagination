@@ -30,7 +30,7 @@ dependencies {
 
 _See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
 
-### Ktor Integration
+#### Ktor Integration
 
 The library provides an extension function in the ApplicationCall class to obtain pagination and sorting information from a request.
 Whenever receiving a request, use the dedicated extension function to extract pagination and sorting information.

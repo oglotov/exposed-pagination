@@ -2,6 +2,7 @@
  * Copyright (c) 2024-Present Perracodex. Use of this source code is governed by an MIT license.
  */
 import com.vanniktech.maven.publish.SonatypeHost
+import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     `java-library`
@@ -12,8 +13,8 @@ plugins {
     alias(libs.plugins.vanniktech)
 }
 
-group = "io.github.perracodex"
-version = "1.0.1"
+group = project.properties["group"] as String
+version = project.properties["version"] as String
 
 // Configuration block for all projects in this multi-project build.
 allprojects {
@@ -53,16 +54,23 @@ tasks.test {
 // https://central.sonatype.com/publishing/deployments
 // https://vanniktech.github.io/gradle-maven-publish-plugin/central/#automatic-release
 mavenPublishing {
+    val artifactId: String = project.properties["artifactId"] as String
+    val repository: String = project.properties["repository"] as String
+    val repositoryConnection: String = project.properties["repositoryConnection"] as String
+    val developer: String = project.properties["developer"] as String
+    val pomName: String = project.properties["pomName"] as String
+    val pomDescription: String = project.properties["pomDescription"] as String
+
     coordinates(
         groupId = group as String,
-        artifactId = "exposed-pagination",
+        artifactId = artifactId,
         version = version as String
     )
 
     pom {
-        name.set("Exposed ORM Pagination")
-        description.set("A Kotlin library providing pagination support for the Exposed ORM and Ktor.")
-        url.set("https://github.com/perracodex/exposed-pagination")
+        name.set(pomName)
+        description.set(pomDescription)
+        url.set("https://$repository/$artifactId")
         licenses {
             license {
                 name.set("MIT License")
@@ -71,20 +79,20 @@ mavenPublishing {
         }
         developers {
             developer {
-                id.set("perracodex")
-                name.set("Perracodex")
+                id.set(developer)
+                name.set(developer.capitalized())
                 email.set(System.getenv("DEVELOPER_EMAIL"))
-                url = "https://github.com/perracodex"
+                url = "https://$repository"
             }
         }
         scm {
-            connection.set("scm:git:git://github.com/perracodex/exposed-pagination.git")
-            developerConnection.set("scm:git:ssh://github.com:perracodex/exposed-pagination.git")
-            url.set("https://github.com/perracodex/exposed-pagination")
+            connection.set("scm:git:git://$repository/$artifactId.git")
+            developerConnection.set("scm:git:ssh://$repositoryConnection/$artifactId.git")
+            url.set("https://$repository/$artifactId")
         }
     }
 
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral(host = SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)
     signAllPublications()
 }
 

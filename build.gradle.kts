@@ -16,24 +16,15 @@ plugins {
 group = project.properties["group"] as String
 version = project.properties["version"] as String
 
-// Configuration block for all projects in this multi-project build.
-allprojects {
-
-    // Define repositories where dependencies are fetched from.
-    repositories {
-        // Use Maven Central as the primary repository for fetching dependencies.
-        mavenCentral()
-
-        // Used to include locally published libraries. Useful for testing libraries
-        // that are built and published locally.
-        mavenLocal()
-    }
+repositories {
+    mavenCentral()
+    mavenLocal()
 }
 
 kotlin {
     jvmToolchain(jdkVersion = 17)
 
-    // Enable explicit API mode for all subprojects.
+    // Enable explicit API mode.
     // https://github.com/Kotlin/KEEP/blob/master/proposals/explicit-api-mode.md
     // https://kotlinlang.org/docs/whatsnew14.html#explicit-api-mode-for-library-authors
     explicitApi()

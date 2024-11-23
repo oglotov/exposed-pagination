@@ -16,11 +16,11 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 ---
 
 ### Installation
-Add the library to your project gradle dependencies. Make sure to replace `1.0.2` with the latest version.
+Add the library to your project gradle dependencies.
 
 ```kotlin
 dependencies {
-    implementation("io.github.perracodex:exposed-pagination:1.0.2")
+    implementation("io.github.perracodex:exposed-pagination:<VERSION>")
 }
 ```
 

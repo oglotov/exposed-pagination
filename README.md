@@ -37,7 +37,7 @@ dependencies {
 
 ### Usage
 
-_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html).
+_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
 
 #### Ktor Integration
 

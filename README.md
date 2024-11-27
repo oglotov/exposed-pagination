@@ -6,6 +6,7 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 ---
 
 ### Features
+
 - **Easy Pagination**: Apply pagination to Exposed queries with a single function call.
 - **Sorting Support**: Sort query results based on multiple fields and directions.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
@@ -16,6 +17,7 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 ---
 
 ### Installation
+
 Add the library to your project gradle dependencies.
 
 ```kotlin
@@ -24,11 +26,18 @@ dependencies {
 }
 ```
 
+### Version Compatibility
+
+| **Kopapi** | **Ktor**   | **Kotlin**      |
+|------------|------------|-----------------|
+| 1.0.3      | \>= 0.56.0 | \>= 2.1.0       |     
+| 1.0.2      | \>= 0.56.0 | 2.0.20 - 2.0.21 |
+
 ---
 
 ### Usage
 
-_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
+_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html).
 
 #### Ktor Integration
 
@@ -38,6 +47,7 @@ Whenever receiving a request, use the dedicated extension function to extract pa
 `call.getPageable()`
 
 **Example:**
+
 ```kotlin   
 import io.perracodex.exposed.pagination.*
 
@@ -89,6 +99,7 @@ data class Employee(
     }
 }
 ```
+
 #### Integration with Ktor StatusPages plugin
 
 If using the Ktor [StatusPages](https://ktor.io/docs/server-status-pages.html) plugin, you can handle exceptions thrown by the pagination library
@@ -103,7 +114,7 @@ fun Application.configureStatusPages() {
                 message = "${cause.errorCode} | ${cause.message} | ${cause.reason ?: ""}"
             )
         }
-        
+
         // Other exception handlers...
     }
 }

@@ -28,16 +28,16 @@ dependencies {
 
 ### Version Compatibility
 
-| **Kopapi** | **Ktor**   | **Kotlin**      |
-|------------|------------|-----------------|
-| 1.0.3      | \>= 0.56.0 | \>= 2.1.0       |     
-| 1.0.2      | \>= 0.56.0 | 2.0.20 - 2.0.21 |
+| **ExposedPagination** | **Exposed** | Ktor  | **Kotlin** |
+|-----------------------|-------------|-------|------------|
+| 1.0.4                 | \>= 0.56.0  | 3.0.2 | \>= 2.1.0  |
 
 ---
 
 ### Usage
 
-_See also the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
+_See also
+the [API reference documentation](https://www.javadoc.io/doc/io.github.perracodex/exposed-pagination/latest/-exposed-pagination/io.perracodex.exposed.pagination/index.html)._
 
 #### Ktor Integration
 
@@ -65,21 +65,40 @@ fun Route.findAllEmployees() {
 Use the `paginate` extension function on your Exposed Query to apply pagination.
 
 ```kotlin
-import org.jetbrains.exposed.sql.*
 import io.perracodex.exposed.pagination.*
 
-fun getAllEmployees(pageable: Pageable?): Page<Employee> { // Return a Page object.
+fun getAllEmployees(pageable: Pageable?): Page<Employee> {
     return transaction {
-        EmployeeTable.selectAll()
-            .paginate(pageable = pageable, transform = Employee) // Apply pagination to the query.
+        EmployeeTable.selectAll().paginate(
+            pageable = pageable,
+            map = object : MapModel<Employee> {
+                override fun from(row: ResultRow): Employee {
+                    return Employee.from(
+                        id = row[EmployeeTable.id],
+                        firstName = row[EmployeeTable.firstName],
+                        lastName = row[EmployeeTable.lastName]
+                    )
+                }
+            }
+        )
     }
 }
 ```
 
-#### Setting the Query ResultRow transform in the Domain Models
+#### Mapping Query Results within the Domain Model Companion Object
 
-Implement in your domain model companion objects the [IModelTransform](./src/main/kotlin/io/perracodex/exposed/pagination/IModelTransform.kt) interface.
-This interface is used by the pagination library to transform database ResultRows from a query result into domain models.
+Alternatively, the model mapping can also be done in the domain model companion objects as follows:
+
+```kotlin
+import io.perracodex.exposed.pagination.*
+
+fun getAllEmployees(pageable: Pageable?): Page<Employee> {
+    return transaction {
+        EmployeeTable.selectAll()
+            .paginate(pageable = pageable, map = Employee)
+    }
+}
+```
 
 ```kotlin
 data class Employee(
@@ -87,9 +106,8 @@ data class Employee(
     val firstName: String,
     val lastName: String,
 ) {
-    companion object : IModelTransform<Employee> { // Implement the IModelTransform interface.
+    companion object : MapModel<Employee> {
         override fun from(row: ResultRow): Employee {
-            // Transform the ResultRow into the domain model as needed.
             return Employee(
                 id = row[EmployeeTable.id],
                 firstName = row[EmployeeTable.firstName],
@@ -102,7 +120,8 @@ data class Employee(
 
 #### Integration with Ktor StatusPages plugin
 
-If using the Ktor [StatusPages](https://ktor.io/docs/server-status-pages.html) plugin, you can handle exceptions thrown by the pagination library
+If using the Ktor [StatusPages](https://ktor.io/docs/server-status-pages.html) plugin, you can handle exceptions thrown by the pagination
+library
 as follows:
 
 ```kotlin
@@ -139,18 +158,25 @@ You can use HTTP query parameters to control pagination and sorting in your API 
 ### Samples:
 
 Page 0, 10 elements per page:
+
 ```bash
 GET http://localhost:8080/v1/employees?page=0&size=10
 ```
+
 Page 5, 24 elements per page, sorted by first name ascending:
+
 ```bash
 GET http://localhost:8080/v1/employees?page=5&size=24&sort=firstName,asc
 ```
+
 Page 2, 50 elements per page, sorted by first name ascending and last name descending:
+
 ```bash
 `GET` http://localhost:8080/v1/employees?page=2&size=50&sort=firstName,asc&sort=lastName,desc
 ```
+
 No pagination, sorted by first name, default to ascending:
+
 ```bash
 `GET` http://localhost:8080/v1/employees?sort=firstName
 ```
@@ -171,4 +197,5 @@ Syntax: `sort=tableName.fieldName,asc`
 ---
 
 ### License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

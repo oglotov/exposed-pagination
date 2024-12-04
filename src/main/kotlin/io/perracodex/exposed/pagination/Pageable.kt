@@ -4,7 +4,6 @@
 
 package io.perracodex.exposed.pagination
 
-import io.perracodex.exposed.pagination.Pageable.Sort
 import kotlinx.serialization.Serializable
 
 /**

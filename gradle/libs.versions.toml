@@ -2,36 +2,64 @@
 
 [versions]
 
-dokka = "1.9.20"                        # https://github.com/Kotlin/dokka/releases
-exposed = "0.56.0"                      # https://github.com/JetBrains/Exposed/releases
-kotlin = "2.0.20"                       # https://github.com/JetBrains/kotlin/releases
-kotlinx-serialization = "1.7.3"         # https://github.com/Kotlin/kotlinx.serialization/releases
-ktor = "2.3.12"                         # https://ktor.io/docs/releases.html#release-details
-vanniktech = "0.29.0"                   # https://github.com/vanniktech/gradle-maven-publish-plugin/releases
+detekt = "1.23.7"
+dokka = "1.9.20"
+exposed = "0.56.0"
+kotlin = "2.1.0"
+kotlinx-serialization = "1.7.3"
+ktor = "3.0.2"
+vanniktech = "0.29.0"
+
 
 [plugins]
 
+# Detekt.
+# https://github.com/detekt/detekt/releases
+# https://github.com/detekt/detekt
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+
+# Dokka.
+# https://github.com/Kotlin/dokka/releases
+# https://github.com/Kotlin/dokka
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+
+# Kotlin JVM.
+# https://github.com/JetBrains/kotlin/releases
+# https://github.com/JetBrains/kotlin
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+# Kotlin Serialization.
+# https://github.com/Kotlin/kotlinx.serialization/releases
+# https://github.com/Kotlin/kotlinx.serialization
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Gradle Maven Publish Plugin.
+# https://github.com/vanniktech/gradle-maven-publish-plugin/releases
+# https://github.com/vanniktech/gradle-maven-publish-plugin
 vanniktech = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech" }
 
 
 [libraries]
 
+# Detekt.
+# https://github.com/detekt/detekt/releases
+# https://github.com/detekt/detekt
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
 # Exposed ORM.
+# https://github.com/JetBrains/Exposed/releases
 # https://github.com/JetBrains/Exposed
 # https://github.com/JetBrains/Exposed/blob/main/docs/ChangeLog.md
-# https://github.com/JetBrains/Exposed/releases
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 
 # Serialization (part of the pLugin).
-# https://github.com/Kotlin/kotlinx.serialization
 # https://github.com/Kotlin/kotlinx.serialization/releases
+# https://github.com/Kotlin/kotlinx.serialization
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 # Ktor.
+# https://github.com/ktorio/ktor/releases
 # https://api.ktor.io
 # https://github.com/ktorio/ktor
-# https://github.com/ktorio/ktor/releases
+# https://ktor.io/docs/releases.html#release-details
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }

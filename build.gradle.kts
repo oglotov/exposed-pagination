@@ -24,6 +24,22 @@ repositories {
     mavenLocal()
 }
 
+// Configure Detekt for static code analysis.
+detekt {
+    buildUponDefaultConfig = true
+    allRules = true
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
+}
+
+// Configure Detekt task reports.
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        sarif.required.set(true)
+    }
+}
+
 kotlin {
     jvmToolchain(jdkVersion = 17)
 

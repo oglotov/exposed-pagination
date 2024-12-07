@@ -12,12 +12,12 @@ import kotlinx.serialization.Serializable
  * about the pagination state.
  *
  * @param T The type of elements contained within the page.
- * @property details Metadata providing [Details] about the pagination state, such as total pages and current page index.
+ * @property details Metadata providing [PageDetails] about the pagination state, such as total pages and current page index.
  * @property content The list of elements of type [T] contained in the page.
  */
 @Serializable
 public data class Page<out T : Any>(
-    val details: Details,
+    val details: PageDetails,
     val content: List<T>,
 ) {
     /**
@@ -36,7 +36,7 @@ public data class Page<out T : Any>(
      * @property sort The sorting criteria applied to the elements within the page, if any.
      */
     @Serializable
-    public data class Details(
+    public data class PageDetails(
         val totalPages: Int,
         val pageIndex: Int,
         val totalElements: Int,
@@ -47,7 +47,7 @@ public data class Page<out T : Any>(
         val hasNext: Boolean,
         val hasPrevious: Boolean,
         val isOverflow: Boolean,
-        val sort: List<Pageable.Sort>?,
+        val sort: List<Pageable.PageSorting>?,
     )
 
     public companion object {
@@ -57,7 +57,7 @@ public data class Page<out T : Any>(
          * @param content The list of elements to include in the current page.
          * @param totalElements The total count of elements across all pages.
          * @param pageable The [Pageable] settings used to retrieve the content. `null` if no pagination was applied.
-         * @return A [Page] containing the specified [content] and corresponding pagination [Details].
+         * @return A [Page] containing the specified [content] and corresponding pagination [PageDetails].
          */
         public fun <T : Any> build(content: List<T>, totalElements: Int, pageable: Pageable?): Page<T> {
             // Set default page size.
@@ -87,7 +87,7 @@ public data class Page<out T : Any>(
 
             // Construct the Page object with the determined states.
             return Page(
-                details = Details(
+                details = PageDetails(
                     totalPages = totalPages,
                     pageIndex = pageIndex,
                     totalElements = totalElements,
@@ -109,7 +109,7 @@ public data class Page<out T : Any>(
          * Useful for scenarios where a query returns no results but pagination metadata is still required.
          *
          * @param pageable The [Pageable] settings that were applied to the query, or `null` if no pagination was used.
-         * @return An empty [Page] with appropriate pagination [Details].
+         * @return An empty [Page] with appropriate pagination [PageDetails].
          */
         public fun <T : Any> empty(pageable: Pageable?): Page<T> {
             return build(content = emptyList(), totalElements = 0, pageable = pageable)

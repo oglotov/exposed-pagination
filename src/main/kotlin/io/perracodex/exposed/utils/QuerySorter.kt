@@ -24,7 +24,7 @@ import kotlin.reflect.full.memberProperties
  * - **Column Resolution:** Resolves column references from sorting directives, handling ambiguities.
  * - **Caching:** Utilizes a cache to manage column references, minimizing the overhead of reflection-based resolution.
  *
- * @see [Pageable.Sort]
+ * @see [Pageable.PageSorting]
  * @see [Query]
  * @see [PaginationError]
  */
@@ -44,19 +44,19 @@ internal object QuerySorter {
 
     /**
      * Applies the specified sorting directives to the given [Query], by processing
-     * each [Pageable.Sort] directive, resolves the corresponding [Column] within
+     * each [Pageable.PageSorting] directive, resolves the corresponding [Column] within
      * the context of the query's tables, and applies the sorting order to the [Query].
      *
      * @param query The [Query] instance to which the sorting directives will be applied.
-     * @param sortDirectives A list of [Pageable.Sort] directives defining the sorting order.
+     * @param sortDirectives A list of [Pageable.PageSorting] directives defining the sorting order.
      * @throws PaginationError.InvalidSortDirective If a sort directive references a non-existent field or table.
      * @throws PaginationError.AmbiguousSortField If a sort directive's field is found in multiple tables
      * without explicit table specification.
      *
-     * @see [Pageable.Sort]
+     * @see [Pageable.PageSorting]
      * @see [PaginationError]
      */
-    fun applyOrder(query: Query, sortDirectives: List<Pageable.Sort>) {
+    fun applyOrder(query: Query, sortDirectives: List<Pageable.PageSorting>) {
         if (sortDirectives.isEmpty()) {
             return
         }
@@ -78,8 +78,8 @@ internal object QuerySorter {
             // Apply the sorting order to the query based on the direction
             // specified in the Pageable.
             val sortOrder: SortOrder = when (sort.direction) {
-                Pageable.Direction.ASC -> SortOrder.ASC
-                Pageable.Direction.DESC -> SortOrder.DESC
+                Pageable.PageDirection.ASC -> SortOrder.ASC
+                Pageable.PageDirection.DESC -> SortOrder.DESC
             }
             query.orderBy(column to sortOrder)
         }
@@ -89,20 +89,20 @@ internal object QuerySorter {
      * Identifies the target tables within the [Query] that correspond to a given [sort] directive.
      *
      * This method filters the list of tables involved in the query based on the table name
-     * specified in the [Pageable.Sort] directive. If a table name is provided, it selects
+     * specified in the [Pageable.PageSorting] directive. If a table name is provided, it selects
      * only the table that matches the specified name. If no table name is specified,
      * it returns all tables involved in the [Query].
      *
      * @param queryTables The list of all the [Table] instances involved in the current [Query].
-     * @param sort The [Pageable.Sort] directive containing the table name (if any) and field name.
+     * @param sort The [Pageable.PageSorting] directive containing the table name (if any) and field name.
      *
      * @return A list of [Table] objects that match the sorting directive's table name, or all tables if none is specified.
      * @throws PaginationError.InvalidSortDirective If the specified table name does not exist within the query's tables.
      *
-     * @see [Pageable.Sort]
+     * @see [Pageable.PageSorting]
      * @see [PaginationError]
      */
-    private fun findTargetTables(queryTables: List<Table>, sort: Pageable.Sort): List<Table> {
+    private fun findTargetTables(queryTables: List<Table>, sort: Pageable.PageSorting): List<Table> {
         return sort.table?.let { tableName ->
             queryTables.filter { table ->
                 table.tableName.equals(other = tableName, ignoreCase = true)
@@ -124,16 +124,16 @@ internal object QuerySorter {
      * retrievals.
      *
      * @param key A unique string key generated from the query tables and sort directive.
-     * @param sort The [Pageable.Sort] directive containing the field name and sort direction.
+     * @param sort The [Pageable.PageSorting] directive containing the field name and sort direction.
      * @param targets A list of [Table] instances to search for the corresponding column.
      * @return The resolved [Column] instance corresponding to the sort directive.
      * @throws PaginationError.InvalidSortDirective If the field specified in the sort directive does not exist in the target tables.
      * @throws PaginationError.AmbiguousSortField If the field exists in multiple tables without explicit table specification.
      *
-     * @see [Pageable.Sort]
+     * @see [Pageable.PageSorting]
      * @see [PaginationError]
      */
-    private fun getColumn(key: String, sort: Pageable.Sort, targets: List<Table>): Column<*> {
+    private fun getColumn(key: String, sort: Pageable.PageSorting, targets: List<Table>): Column<*> {
         // Check if the column is already cached, and return it if found.
         columnCache[key]?.let { column ->
             return column
@@ -194,7 +194,7 @@ internal object QuerySorter {
     }
 
     /**
-     * Generates a unique cache key based on the [Query] tables and a [Pageable.Sort] directive.
+     * Generates a unique cache key based on the [Query] tables and a [Pageable.PageSorting] directive.
      *
      * The cache key is constructed by concatenating the names of all tables involved in the [Query],
      * followed by the table name (if specified) the field belongs to, and finally the field name.
@@ -206,10 +206,10 @@ internal object QuerySorter {
      * - Without table specified: `"employees::departments::contracts=firstName"`
      *
      * @param queryTables The list of [Table] objects involved in the [Query].
-     * @param sort The [Pageable.Sort] directive containing the table name (optional) and field name.
+     * @param sort The [Pageable.PageSorting] directive containing the table name (optional) and field name.
      * @return A unique string key representing the combination of query tables and sorting directive.
      */
-    private fun generateCacheKey(queryTables: List<Table>, sort: Pageable.Sort): String {
+    private fun generateCacheKey(queryTables: List<Table>, sort: Pageable.PageSorting): String {
         val tableNames: String = queryTables.joinToString("::") { it.tableName.lowercase() }
         return "$tableNames=${sort.table?.lowercase()}.${sort.field.lowercase()}"
     }

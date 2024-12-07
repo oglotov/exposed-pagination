@@ -24,10 +24,10 @@ public sealed class PaginationError(
      * This error is thrown when the sorting directive does not specify a table prefix for a field
      * that exists in more than one table involved in the query, leading to ambiguity in sorting.
      *
-     * @param sort The [Pageable.Sort] directive that caused the ambiguity.
+     * @param sort The [Pageable.PageSorting] directive that caused the ambiguity.
      * @param reason A detailed explanation of why the sort field is considered ambiguous.
      */
-    public class AmbiguousSortField(sort: Pageable.Sort, reason: String) : PaginationError(
+    public class AmbiguousSortField(sort: Pageable.PageSorting, reason: String) : PaginationError(
         errorCode = "AMBIGUOUS_SORT_FIELD",
         description = "Detected ambiguous field: ${sort.field}",
         reason = reason
@@ -61,10 +61,10 @@ public sealed class PaginationError(
      *
      * This error is thrown when trying to sort by a field that is not part of the query.
      *
-     * @param sort The [Pageable.Sort] directive that is invalid.
+     * @param sort The [Pageable.PageSorting] directive that is invalid.
      * @param reason A detailed explanation of why the sort directive is considered invalid.
      */
-    public class InvalidSortDirective(sort: Pageable.Sort, reason: String) : PaginationError(
+    public class InvalidSortDirective(sort: Pageable.PageSorting, reason: String) : PaginationError(
         errorCode = "INVALID_SORT_DIRECTIVE",
         description = "Unexpected sort directive: $sort",
         reason = reason

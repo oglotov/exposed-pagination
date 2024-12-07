@@ -11,13 +11,13 @@ import kotlinx.serialization.Serializable
  *
  * @property page The zero-based index of the page to retrieve.
  * @property size The maximum number of elements to include in a single page. `0` to return all elements without pagination.
- * @property sort An optional list of [Sort] directives to order the results.
+ * @property sort An optional list of [PageSorting] directives to order the results.
  */
 @Serializable
 public data class Pageable(
     val page: Int,
     val size: Int,
-    val sort: List<Sort>? = null
+    val sort: List<PageSorting>? = null
 ) {
     init {
         require(value = (page >= 0)) { "Page index must be >= 0." }
@@ -27,7 +27,7 @@ public data class Pageable(
     /**
      * Sorting direction.
      */
-    public enum class Direction {
+    public enum class PageDirection {
         /** Ascending sorting direction. */
         ASC,
 
@@ -40,13 +40,13 @@ public data class Pageable(
      *
      * @property table Optional name of the table that the field belongs to. Used to find ambiguities in multi-table queries.
      * @property field The name of the field to sort by.
-     * @property direction The [Direction] in which to sort the field.
+     * @property direction The [PageDirection] in which to sort the field.
      */
     @Serializable
-    public data class Sort(
+    public data class PageSorting(
         val table: String? = null,
         val field: String,
-        val direction: Direction
+        val direction: PageDirection
     ) {
         init {
             require(value = field.isNotBlank()) { "The sorting field name must not be blank." }

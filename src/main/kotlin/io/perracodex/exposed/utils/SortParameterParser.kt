@@ -9,7 +9,7 @@ import io.perracodex.exposed.pagination.PaginationError
 
 /**
  * Provides utility functions to parse sorting parameters
- * into a list of [Pageable.Sort] directives.
+ * into a list of [Pageable.PageSorting] directives.
  */
 internal object SortParameterParser {
     /** Delimiter used to split the sort parameter into field name and direction (e.g., "fieldName,ASC"). */
@@ -46,12 +46,12 @@ internal object SortParameterParser {
     private const val FIELD_NAME_INDEX: Int = 1
 
     /**
-     * Parses the sorting parameters into a list of [Pageable.Sort] directives.
+     * Parses the sorting parameters into a list of [Pageable.PageSorting] directives.
      *
      * @param sortParameters The list of sorting parameters to parse.
-     * @return A list of [Pageable.Sort] directives representing the sorting configuration.
+     * @return A list of [Pageable.PageSorting] directives representing the sorting configuration.
      */
-    fun getSortDirectives(sortParameters: List<String>): List<Pageable.Sort>? {
+    fun getSortDirectives(sortParameters: List<String>): List<Pageable.PageSorting>? {
         return sortParameters.mapNotNull { parameter ->
             if (parameter.isBlank()) {
                 throw PaginationError.MissingSortDirective()
@@ -68,18 +68,18 @@ internal object SortParameterParser {
                 val tableColumnPair: TableColumnPair = parseTableAndField(segment = fieldSegment)
 
                 // Resolve the sorting direction from the segment.
-                val direction: Pageable.Direction = if (sortSegments.size >= 2) {
+                val direction: Pageable.PageDirection = if (sortSegments.size >= 2) {
                     runCatching {
-                        Pageable.Direction.valueOf(sortSegments[DIRECTION_SEGMENT_INDEX].uppercase())
+                        Pageable.PageDirection.valueOf(sortSegments[DIRECTION_SEGMENT_INDEX].uppercase())
                     }.getOrElse {
                         throw PaginationError.InvalidOrderDirection(direction = sortSegments[DIRECTION_SEGMENT_INDEX])
                     }
                 } else {
                     // If no direction is specified, default to ascending.
-                    Pageable.Direction.ASC
+                    Pageable.PageDirection.ASC
                 }
 
-                Pageable.Sort(
+                Pageable.PageSorting(
                     table = tableColumnPair.table,
                     field = tableColumnPair.field,
                     direction = direction

@@ -68,7 +68,7 @@ public fun ApplicationCall.getPageable(): Pageable? {
     }
 
     // Parse sorting parameters into a list of Sort directives.
-    val sort: List<Pageable.Sort>? = sortParameters?.let {
+    val sort: List<Pageable.PageSorting>? = sortParameters?.let {
         SortParameterParser.getSortDirectives(sortParameters = sortParameters)
     }
 

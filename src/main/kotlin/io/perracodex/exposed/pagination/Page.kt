@@ -47,7 +47,7 @@ public data class Page<out T : Any>(
         val hasNext: Boolean,
         val hasPrevious: Boolean,
         val isOverflow: Boolean,
-        val sort: List<Pageable.PageSorting>?,
+        val sort: List<Pageable.PageSort>?,
     )
 
     public companion object {

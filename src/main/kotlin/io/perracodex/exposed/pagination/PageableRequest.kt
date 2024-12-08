@@ -6,6 +6,7 @@ package io.perracodex.exposed.pagination
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.perracodex.exposed.utils.PageableKeys
 import io.perracodex.exposed.utils.SortParameterParser
 
 /**
@@ -51,8 +52,8 @@ import io.perracodex.exposed.utils.SortParameterParser
  */
 public fun ApplicationCall.getPageable(): Pageable? {
     val parameters: Parameters = request.queryParameters
-    val pageIndex: Int? = parameters["page"]?.toIntOrNull()
-    val pageSize: Int? = parameters["size"]?.toIntOrNull()
+    val pageIndex: Int? = parameters[PageableKeys.PAGE.key]?.toIntOrNull()
+    val pageSize: Int? = parameters[PageableKeys.SIZE.key]?.toIntOrNull()
 
     // If only one of the page parameters is provided, raise an error.
     if ((pageIndex == null).xor(other = pageSize == null)) {
@@ -60,7 +61,7 @@ public fun ApplicationCall.getPageable(): Pageable? {
     }
 
     // Retrieve the 'sort' parameters. Each can contain a field name and a sort direction.
-    val sortParameters: List<String>? = parameters.getAll(name = "sort")
+    val sortParameters: List<String>? = parameters.getAll(name = PageableKeys.SORT.key)
 
     // If no parameters are provided, means no pagination is requested.
     if (pageIndex == null && sortParameters.isNullOrEmpty()) {
@@ -68,7 +69,7 @@ public fun ApplicationCall.getPageable(): Pageable? {
     }
 
     // Parse sorting parameters into a list of Sort directives.
-    val sort: List<Pageable.PageSorting>? = sortParameters?.let {
+    val sort: List<Pageable.PageSort>? = sortParameters?.let {
         SortParameterParser.getSortDirectives(sortParameters = sortParameters)
     }
 

@@ -6,10 +6,12 @@ package io.perracodex.exposed.utils
 
 import io.perracodex.exposed.pagination.Pageable
 import io.perracodex.exposed.pagination.PaginationError
+import io.perracodex.exposed.utils.SortParameterParser.FIELD_SEGMENT_DELIMITER
+import io.perracodex.exposed.utils.SortParameterParser.SORT_SEGMENT_DELIMITER
 
 /**
  * Provides utility functions to parse sorting parameters
- * into a list of [Pageable.PageSorting] directives.
+ * into a list of [Pageable.PageSort] directives.
  */
 internal object SortParameterParser {
     /** Delimiter used to split the sort parameter into field name and direction (e.g., "fieldName,ASC"). */
@@ -46,19 +48,18 @@ internal object SortParameterParser {
     private const val FIELD_NAME_INDEX: Int = 1
 
     /**
-     * Parses the sorting parameters into a list of [Pageable.PageSorting] directives.
+     * Parses the sorting parameters into a list of [Pageable.PageSort] directives.
      *
      * @param sortParameters The list of sorting parameters to parse.
-     * @return A list of [Pageable.PageSorting] directives representing the sorting configuration.
+     * @return A list of [Pageable.PageSort] directives representing the sorting configuration.
      */
-    fun getSortDirectives(sortParameters: List<String>): List<Pageable.PageSorting>? {
+    fun getSortDirectives(sortParameters: List<String>): List<Pageable.PageSort>? {
         return sortParameters.mapNotNull { parameter ->
             if (parameter.isBlank()) {
                 throw PaginationError.MissingSortDirective()
             }
 
-            val sortSegments: List<String> = parameter.split(SORT_SEGMENT_DELIMITER)
-                .map(String::trim)
+            val sortSegments: List<String> = parameter.split(SORT_SEGMENT_DELIMITER).map(String::trim)
 
             return@mapNotNull if (sortSegments.isEmpty()) {
                 null
@@ -79,7 +80,7 @@ internal object SortParameterParser {
                     Pageable.PageDirection.ASC
                 }
 
-                Pageable.PageSorting(
+                Pageable.PageSort(
                     table = tableColumnPair.table,
                     field = tableColumnPair.field,
                     direction = direction

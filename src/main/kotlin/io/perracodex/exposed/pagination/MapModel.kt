@@ -112,6 +112,7 @@ import org.jetbrains.exposed.sql.ResultRow
  *             // Extract Contacts. Each must perform its own mapping.
  *             val contact: List<Contact>? = rows.mapNotNull { row ->
  *                 row.getOrNull(ContactTable.id)?.let {
+ *                     // Contact must perform its own mapping.
  *                     Contact.from(row = row)
  *                 }
  *             }.takeIf { it.isNotEmpty() }
@@ -119,6 +120,7 @@ import org.jetbrains.exposed.sql.ResultRow
  *             // Extract Employments. Each must perform its own mapping.
  *             val employments: List<Employment>? = rows.mapNotNull { row ->
  *                 row.getOrNull(EmploymentTable.id)?.let {
+ *                     // Employment must perform its own mapping.
  *                     Employment.from(row = row)
  *                 }
  *             }.takeIf { it.isNotEmpty() }
@@ -153,6 +155,9 @@ public interface MapModel<T> {
     /**
      * Maps a group of [ResultRow] instances into a single domain model of type [T],
      * aggregating related entities as needed.
+     *
+     * It is expected that the mapping logic will handle the aggregation of related entities
+     * converting the list of [ResultRow] instances into a single domain model.
      *
      * Default implementation maps only the first row.
      * Models that require aggregation should override this method.

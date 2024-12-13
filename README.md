@@ -48,9 +48,7 @@ Whenever receiving a request, use the dedicated extension function to extract pa
 
 **Example:**
 
-```kotlin   
-import io.perracodex.exposed.pagination.*
-
+```kotlin
 fun Route.findAllEmployees() {
     get("v1/employees") {
         val pageable: Pageable? = call.getPageable() // Get the pagination directives, (if any).
@@ -65,8 +63,6 @@ fun Route.findAllEmployees() {
 Use the `paginate` extension function on your Exposed Query to apply pagination.
 
 ```kotlin
-import io.perracodex.exposed.pagination.*
-
 fun getAllEmployees(pageable: Pageable?): Page<Employee> {
     return transaction {
         EmployeeTable.selectAll().paginate(
@@ -90,8 +86,6 @@ fun getAllEmployees(pageable: Pageable?): Page<Employee> {
 Alternatively, the model mapping can also be done in the domain model companion objects as follows:
 
 ```kotlin
-import io.perracodex.exposed.pagination.*
-
 fun getAllEmployees(pageable: Pageable?): Page<Employee> {
     return transaction {
         EmployeeTable.selectAll()
@@ -117,6 +111,88 @@ data class Employee(
     }
 }
 ```
+---
+
+#### Handling 1-to-Many Relationships
+
+For complex queries involving multiple tables and producing 1-to-many relationships,
+you can use the `map` overload function to map the query N results to the domain model,
+groping by the parent entity.
+
+Example:
+Employee with a 1-to-many relationship to N Contact and N Employment records.
+
+```kotlin
+fun findAll(pageable: Pageable?): Page<Employee> { 
+    return transaction {
+        EmployeeTable
+            .leftJoin(ContactTable)
+            .leftJoin(EmploymentTable)
+            .selectAll()
+            .paginate(
+                pageable = pageable,
+                map = Employee,
+                groupBy = EmployeeTable.id
+            )
+    }
+}
+
+data class Employee(
+    val id: Uuid,
+    val firstName: String,
+    val lastName: String,
+    val contact: List<Contact>,
+    val employments: List<Employment>
+) {
+    companion object : MapModel<Employee> {
+        override fun from(row: ResultRow): Employee {
+            val firstName: String = row[EmployeeTable.firstName]
+            val lastName: String = row[EmployeeTable.lastName]
+            return Employee(
+                    id = row[EmployeeTable.id],
+                    firstName = firstName,
+                    lastName = lastName,
+                    contact = listOf(),
+                    employments = listOf()
+            )
+        }
+    
+        override fun from(rows: List<ResultRow>): Employee? {
+            if (rows.isEmpty()) {
+                    return null
+                }
+    
+            // As we are handling a 1 -> N relationship,
+            // we only need the first row to extract the top-level record.
+            val topLevelRecord: ResultRow = rows.first()
+            val employee: Employee = from(row = topLevelRecord)
+    
+            // Extract Contacts. Each must perform its own mapping.
+            val contact: List<Contact>? = rows.mapNotNull { row ->
+                    row.getOrNull(ContactTable.id)?.let {
+                        // Contact must perform its own mapping.
+                        Contact.from(row = row)
+                    }
+                }.takeIf { it.isNotEmpty() }
+    
+            // Extract Employments. Each must perform its own mapping.
+            val employments: List<Employment>? = rows.mapNotNull { row ->
+                    row.getOrNull(EmploymentTable.id)?.let {
+                        // Employment must perform its own mapping.
+                        Employment.from(row = row)
+                    }
+                }.takeIf { it.isNotEmpty() }
+    
+            return employee.copy(
+                    contact = contact,
+                    employments = employments
+                )
+        }
+    }
+}
+```
+
+---
 
 #### Integration with Ktor StatusPages plugin
 

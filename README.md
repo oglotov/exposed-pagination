@@ -168,20 +168,20 @@ data class Employee(
             val employee: Employee = from(row = topLevelRecord)
     
             // Extract Contacts. Each must perform its own mapping.
-            val contact: List<Contact>? = rows.mapNotNull { row ->
+            val contact: List<Contact> = rows.mapNotNull { row ->
                     row.getOrNull(ContactTable.id)?.let {
                         // Contact must perform its own mapping.
                         Contact.from(row = row)
                     }
-                }.takeIf { it.isNotEmpty() }
+                }
     
             // Extract Employments. Each must perform its own mapping.
-            val employments: List<Employment>? = rows.mapNotNull { row ->
+            val employments: List<Employment> = rows.mapNotNull { row ->
                     row.getOrNull(EmploymentTable.id)?.let {
                         // Employment must perform its own mapping.
                         Employment.from(row = row)
                     }
-                }.takeIf { it.isNotEmpty() }
+                }
     
             return employee.copy(
                     contact = contact,

@@ -4,8 +4,8 @@
 
 package io.perracodex.exposed.pagination
 
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.Parameters
+import io.ktor.server.application.ApplicationCall
 import io.perracodex.exposed.utils.PageableKeys
 import io.perracodex.exposed.utils.SortParameterParser
 

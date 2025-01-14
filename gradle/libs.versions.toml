@@ -4,9 +4,9 @@
 
 detekt = "1.23.7"
 dokka = "2.0.0"
-exposed = "0.57.0"
+exposed = "0.58.0"
 kotlin = "2.1.0"
-kotlinx-serialization = "1.7.3"
+kotlinx-serialization = "1.8.0"
 ktor = "3.0.3"
 vanniktech = "0.30.0"
 

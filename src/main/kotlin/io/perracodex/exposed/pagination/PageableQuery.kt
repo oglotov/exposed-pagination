@@ -171,7 +171,7 @@ public fun Query.paginate(pageable: Pageable?): Query {
         if (pageable.size > 0) {
             val startIndex: Long = pageable.page.toLong() * pageable.size.toLong()
             this.limit(count = pageable.size)
-                .offset(start = startIndex.toLong())
+                .offset(start = startIndex)
         }
     }
 

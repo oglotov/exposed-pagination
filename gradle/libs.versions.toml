@@ -4,10 +4,10 @@
 
 detekt = "1.23.7"
 dokka = "2.0.0"
-exposed = "0.59.0"
-kotlin = "2.1.10"
-kotlinx-serialization = "1.8.0"
-ktor = "3.1.1"
+exposed = "0.61.0"
+kotlin = "2.1.20"
+kotlinx-serialization = "1.8.1"
+ktor = "3.1.2"
 vanniktech = "0.30.0"
 
 

@@ -5,7 +5,6 @@
 package io.perracodex.exposed.utils
 
 import io.ktor.util.logging.*
-import org.slf4j.Logger
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 

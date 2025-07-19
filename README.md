@@ -118,7 +118,7 @@ data class Employee(
 
 For complex queries involving multiple tables and producing 1-to-many relationships,
 you can use the `map` overload function to map the query N results to the domain model,
-groping by the parent entity.
+grouping by the parent entity.
 
 Example:
 Employee with a 1-to-many relationship to N Contact and N Employment records.

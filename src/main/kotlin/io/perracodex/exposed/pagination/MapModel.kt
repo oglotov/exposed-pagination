@@ -4,7 +4,7 @@
 
 package io.perracodex.exposed.pagination
 
-import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.v1.core.ResultRow
 
 /**
  * Contract for mapping a database [ResultRow] into an instance of type [T].

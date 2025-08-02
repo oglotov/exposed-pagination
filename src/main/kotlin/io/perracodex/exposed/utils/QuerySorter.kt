@@ -6,10 +6,12 @@ package io.perracodex.exposed.utils
 
 import io.perracodex.exposed.pagination.Pageable
 import io.perracodex.exposed.pagination.PaginationError
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Query
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.Table
+import io.perracodex.exposed.utils.QuerySorter.columnCache
+import io.perracodex.exposed.utils.QuerySorter.generateCacheKey
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.jdbc.Query
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.full.memberProperties
 

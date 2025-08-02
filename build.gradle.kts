@@ -56,6 +56,7 @@ kotlin {
 dependencies {
     detektPlugins(libs.detekt.formatting)
     implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
     implementation(libs.kotlinx.serialization)
     implementation(libs.ktor.server.core)
     testImplementation(kotlin("test"))

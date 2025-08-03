@@ -5,7 +5,12 @@
 package io.perracodex.exposed.pagination
 
 import io.perracodex.exposed.utils.QuerySorter
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.countDistinct
+import org.jetbrains.exposed.v1.jdbc.Query
+import org.jetbrains.exposed.v1.jdbc.andWhere
+import org.jetbrains.exposed.v1.jdbc.select
 
 /**
  * Retrieves a page from this [Query] based on the specified [pageable] parameters.

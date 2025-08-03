@@ -4,10 +4,10 @@
 
 detekt = "1.23.7"
 dokka = "2.0.0"
-exposed = "0.61.0"
+exposed = "1.0.0-beta-5"
 kotlin = "2.1.20"
 kotlinx-serialization = "1.8.1"
-ktor = "3.1.2"
+ktor = "3.2.2"
 vanniktech = "0.30.0"
 
 
@@ -51,6 +51,7 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 # https://github.com/JetBrains/Exposed
 # https://github.com/JetBrains/Exposed/blob/main/docs/ChangeLog.md
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 
 # Serialization (part of the pLugin).
 # https://github.com/Kotlin/kotlinx.serialization/releases

@@ -25,6 +25,7 @@ public data class Page<out T : Any>(
      *
      * @property totalPages The total number of pages available based on the pagination parameters.
      * @property pageIndex The zero-based index of the current page.
+     * @property position The absolute zero-based starting position (offset).
      * @property totalElements The aggregate number of elements across all pages.
      * @property elementsPerPage The maximum number of elements that can be contained in a single page.
      * @property elementsInPage The actual number of elements present in the current page.
@@ -39,6 +40,7 @@ public data class Page<out T : Any>(
     public data class PageDetails(
         val totalPages: Int,
         val pageIndex: Int,
+        val position: Int,
         val totalElements: Int,
         val elementsPerPage: Int,
         val elementsInPage: Int,
@@ -70,8 +72,13 @@ public data class Page<out T : Any>(
                 0
             }
 
-            // Determine the current page index.
-            val pageIndex: Int = pageable?.page ?: 0
+            // Determine the current page and position indexes
+            val (pageIndex, positionIndex) = when {
+                pageable == null -> 0 to 0
+                pageSize <= 0 -> 0 to 0
+                pageable.position != null -> pageable.position / pageSize to pageable.position
+                else -> pageable.page to pageable.page * pageSize
+            }
 
             // Adjust pagination state based on total pages and content availability.
             val elementsInPage: Int = content.size
@@ -90,6 +97,7 @@ public data class Page<out T : Any>(
                 details = PageDetails(
                     totalPages = totalPages,
                     pageIndex = pageIndex,
+                    position = positionIndex,
                     totalElements = totalElements,
                     elementsPerPage = pageSize,
                     elementsInPage = elementsInPage,

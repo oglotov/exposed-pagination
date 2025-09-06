@@ -10,17 +10,20 @@ import kotlinx.serialization.Serializable
  * Encapsulates the parameters required to request a specific page of data from a paginated dataset.
  *
  * @property page The zero-based index of the page to retrieve.
+ * @property position Optional absolute zero-based starting position within the full result set.
  * @property size The maximum number of elements to include in a single page. `0` to return all elements without pagination.
  * @property sort An optional list of [PageSort] directives to order the results.
  */
 @Serializable
 public data class Pageable(
     val page: Int,
+    val position: Int?,
     val size: Int,
     val sort: List<PageSort>? = null
 ) {
     init {
         require(value = (page >= 0)) { "Page index must be >= 0." }
+        require(value = (position == null || position >= 0)) { "Position must be >= 0 when provided." }
         require(value = (size >= 0)) { "Page size must be >= 0. (0 means all elements)." }
     }
 

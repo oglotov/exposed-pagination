@@ -221,9 +221,10 @@ fun Application.configureStatusPages() {
 ### Syntax
 
 You can use HTTP query parameters to control pagination and sorting in your API endpoints.
+- **Pagination (page/size):** `?page=0&size=10`
+- **Pagination (position/size):** `?position=15&size=10` — starts from absolute element position 15
 
-- **Pagination:** `?page=0&size=10`
-
+Note: `page` and `position` are mutually exclusive; do not provide both in the same request.
 - **Sorting:** `?sort=fieldName,direction`
 
 - **Sorting (multiple fields):** `?sort=fieldName_A,direction_A&sort=fieldName_B,direction_B`
@@ -258,7 +259,12 @@ No pagination, sorted by first name, default to ascending:
 `GET` http://localhost:8080/v1/employees?sort=firstName
 ```
 
----
+Start from absolute position 15, 10 elements per page (equivalent content to page=1 with size=10, but accepts any start
+index):
+
+```bash
+GET http://localhost:8080/v1/employees?position=15&size=10&sort=firstName,asc
+```
 
 ### Resolving Field Ambiguity
 

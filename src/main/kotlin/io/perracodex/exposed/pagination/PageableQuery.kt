@@ -156,7 +156,9 @@ public fun <T : Any, K> Query.paginate(
  *
  * This extension function modifies the query in the following ways:
  * 1. **Sorting:** If [pageable] includes sorting directives, they are applied to the [Query].
- * 2. **Limiting:** Uses page number and size to set the query’s limit and offset.
+ * 2. **Limiting and offset:**
+ *    - If [pageable.position] is defined, it is used as the absolute zero-based starting position (offset).
+ *    - Otherwise, the offset is calculated from the page number as `page * size`.
  *
  * If [pageable] is `null`, or the defined page size is `0`, the entire result set is retrieved without any pagination,
  * and a [Page] containing all domain models is returned.
@@ -174,7 +176,7 @@ public fun Query.paginate(pageable: Pageable?): Query {
         }
 
         if (pageable.size > 0) {
-            val startIndex: Long = pageable.page.toLong() * pageable.size.toLong()
+            val startIndex: Long = pageable.position?.toLong() ?: (pageable.page.toLong() * pageable.size.toLong())
             this.limit(count = pageable.size)
                 .offset(start = startIndex)
         }

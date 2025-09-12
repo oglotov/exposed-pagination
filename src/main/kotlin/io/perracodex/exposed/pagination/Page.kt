@@ -62,13 +62,8 @@ public data class Page<out T : Any>(
          * @return A [Page] containing the specified [content] and corresponding pagination [PageDetails].
          */
         public fun <T : Any> build(content: List<T>, totalElements: Int, pageable: Pageable?): Page<T> {
-            // Set default page size.
             val pageSize: Int = resolvePageSize(pageable = pageable, totalElements = totalElements)
-
-            // Calculate total pages, ensuring totalPages is 0 if there are no elements.
             val totalPages: Int = calculateTotalPages(totalElements = totalElements, pageSize = pageSize)
-
-            // Determine the current page and position indexes
             val (pageIndex: Int, positionIndex: Int) = determineIndexes(pageable = pageable, pageSize = pageSize)
 
             // Adjust pagination state based on total pages and content availability.

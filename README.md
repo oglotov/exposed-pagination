@@ -11,6 +11,7 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 - **Sorting Support**: Sort query results based on multiple fields and directions.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
+- **Flexible Pagination**: Support for both page-based and position-based pagination.
 
 **Note: The library is designed to work with Exposed DSL queries. There is no support for DAO:**
 
@@ -28,10 +29,11 @@ dependencies {
 
 ### Version Compatibility
 
-| **ExposedPagination** | **Exposed**      | Ktor  | **Kotlin**  |
-|-----------------------|------------------|-------|-------------|
-| 1.0.12                | \>= 1.0.0-beta-5 | 3.2.3 | \>= 2.2.0   |
-| 1.0.11                | = 0.61.0         | 3.1.2 | \>= 2.1.20  |
+| **ExposedPagination** | **Exposed**      | Ktor  | **Kotlin** |
+|-----------------------|------------------|-------|------------|
+| 1.0.13                | \>= 1.0.0-rc-1   | 3.3.0 | \>= 2.2.20 |
+| 1.0.12                | \>= 1.0.0-beta-5 | 3.2.3 | \>= 2.2.0  |
+| 1.0.11                | = 0.61.0         | 3.1.2 | \>= 2.1.20 |
 
 ---
 
@@ -112,6 +114,7 @@ data class Employee(
     }
 }
 ```
+
 ---
 
 #### Handling 1-to-Many Relationships
@@ -124,7 +127,7 @@ Example:
 Employee with a 1-to-many relationship to N Contact and N Employment records.
 
 ```kotlin
-fun findAll(pageable: Pageable?): Page<Employee> { 
+fun findAll(pageable: Pageable?): Page<Employee> {
     return transaction {
         EmployeeTable
             .leftJoin(ContactTable)
@@ -150,44 +153,44 @@ data class Employee(
             val firstName: String = row[EmployeeTable.firstName]
             val lastName: String = row[EmployeeTable.lastName]
             return Employee(
-                    id = row[EmployeeTable.id],
-                    firstName = firstName,
-                    lastName = lastName,
-                    contact = listOf(),
-                    employments = listOf()
+                id = row[EmployeeTable.id],
+                firstName = firstName,
+                lastName = lastName,
+                contact = listOf(),
+                employments = listOf()
             )
         }
-    
+
         override fun from(rows: List<ResultRow>): Employee? {
             if (rows.isEmpty()) {
-                    return null
-                }
-    
+                return null
+            }
+
             // As we are handling a 1 -> N relationship,
             // we only need the first row to extract the top-level record.
             val topLevelRecord: ResultRow = rows.first()
             val employee: Employee = from(row = topLevelRecord)
-    
+
             // Extract Contacts. Each must perform its own mapping.
             val contact: List<Contact> = rows.mapNotNull { row ->
-                    row.getOrNull(ContactTable.id)?.let {
-                        // Contact must perform its own mapping.
-                        Contact.from(row = row)
-                    }
+                row.getOrNull(ContactTable.id)?.let {
+                    // Contact must perform its own mapping.
+                    Contact.from(row = row)
                 }
-    
+            }
+
             // Extract Employments. Each must perform its own mapping.
             val employments: List<Employment> = rows.mapNotNull { row ->
-                    row.getOrNull(EmploymentTable.id)?.let {
-                        // Employment must perform its own mapping.
-                        Employment.from(row = row)
-                    }
+                row.getOrNull(EmploymentTable.id)?.let {
+                    // Employment must perform its own mapping.
+                    Employment.from(row = row)
                 }
-    
+            }
+
             return employee.copy(
-                    contact = contact,
-                    employments = employments
-                )
+                contact = contact,
+                employments = employments
+            )
         }
     }
 }
@@ -220,11 +223,13 @@ fun Application.configureStatusPages() {
 
 ### Syntax
 
-You can use HTTP query parameters to control pagination and sorting in your API endpoints.
-- **Pagination (page/size):** `?page=0&size=10`
-- **Pagination (position/size):** `?position=15&size=10` — starts from absolute element position 15
+Use HTTP query parameters to control pagination and sorting in your API endpoints.
+
+- **Pagination (page/size):** `?page=0&size=10` — starts from page 0 (first page), 10 elements per page
+- **Pagination (position/size):** `?position=15&size=10` — starts from absolute element position 15 (0-based index), 10 elements per page
 
 Note: `page` and `position` are mutually exclusive; do not provide both in the same request.
+
 - **Sorting:** `?sort=fieldName,direction`
 
 - **Sorting (multiple fields):** `?sort=fieldName_A,direction_A&sort=fieldName_B,direction_B`

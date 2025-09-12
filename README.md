@@ -12,7 +12,7 @@ including integration with the [Ktor](https://ktor.io/) server framework.
 - **Page Information**: Access detailed pagination information like total pages, current page index, and more.
 - **Ktor Integration**: Extract pagination directives from Ktor requests with a single function call.
 
-**Note: The library is designed to work with Exposed DSL queries. There is no support DAO:**
+**Note: The library is designed to work with Exposed DSL queries. There is no support for DAO:**
 
 ---
 
@@ -31,8 +31,7 @@ dependencies {
 | **ExposedPagination** | **Exposed**      | Ktor  | **Kotlin**  |
 |-----------------------|------------------|-------|-------------|
 | 1.0.12                | \>= 1.0.0-beta-5 | 3.2.3 | \>= 2.2.0   |
-| 1.0.11                | \>= 0.61.0       | 3.1.2 | \>= 2.1.20  |
-| 1.0.10                | \>= 0.59.0       | 3.1.1 | \>= 2.1.10  |
+| 1.0.11                | = 0.61.0         | 3.1.2 | \>= 2.1.20  |
 
 ---
 

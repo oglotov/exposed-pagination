@@ -8,6 +8,7 @@ import io.perracodex.exposed.utils.QuerySorter
 import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.countDistinct
+import org.jetbrains.exposed.v1.core.inSubQuery
 import org.jetbrains.exposed.v1.jdbc.Query
 import org.jetbrains.exposed.v1.jdbc.andWhere
 import org.jetbrains.exposed.v1.jdbc.select
@@ -137,7 +138,6 @@ public fun <T : Any, K> Query.paginate(
 
     // Map each group of rows to the corresponding domain model.
     val content: List<T> = records
-        .asSequence()
         .groupBy { it[groupBy] }
         .mapNotNull { (_, groupRows) ->
             map.from(rows = groupRows)

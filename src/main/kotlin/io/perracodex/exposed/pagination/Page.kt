@@ -73,7 +73,7 @@ public data class Page<out T : Any>(
             }
 
             // Determine the current page and position indexes
-            val (pageIndex, positionIndex) = when {
+            val (pageIndex: Int, positionIndex: Int) = when {
                 pageable == null -> 0 to 0
                 pageSize <= 0 -> 0 to 0
                 pageable.position != null -> pageable.position / pageSize to pageable.position
@@ -86,10 +86,14 @@ public data class Page<out T : Any>(
             val isLast: Boolean = (totalPages == 0) || (pageIndex >= totalPages - 1)
             val hasNext: Boolean = (pageIndex < totalPages - 1) && (totalPages > 0)
             val hasPrevious: Boolean = (pageIndex > 0) && (totalPages > 0)
-            val isOverflow: Boolean = if (totalPages > 0) {
-                pageIndex >= totalPages
-            } else {
-                pageIndex > 0
+
+            // True if the requested page or position exceeds the available elements.
+            val isOverflow: Boolean = when {
+                pageable?.position != null ->
+                    (totalElements in 1..positionIndex) || (totalElements <= 0 && positionIndex > 0)
+
+                else ->
+                    (totalPages in 1..pageIndex) || (totalPages <= 0 && pageIndex > 0)
             }
 
             // Construct the Page object with the determined states.

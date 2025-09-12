@@ -63,22 +63,13 @@ public data class Page<out T : Any>(
          */
         public fun <T : Any> build(content: List<T>, totalElements: Int, pageable: Pageable?): Page<T> {
             // Set default page size.
-            val pageSize: Int = pageable?.size.takeIf { it != null && it > 0 } ?: totalElements
+            val pageSize: Int = resolvePageSize(pageable = pageable, totalElements = totalElements)
 
             // Calculate total pages, ensuring totalPages is 0 if there are no elements.
-            val totalPages: Int = if (totalElements > 0 && pageSize > 0) {
-                ((totalElements + pageSize - 1) / pageSize).coerceAtLeast(minimumValue = 1)
-            } else {
-                0
-            }
+            val totalPages: Int = calculateTotalPages(totalElements = totalElements, pageSize = pageSize)
 
             // Determine the current page and position indexes
-            val (pageIndex: Int, positionIndex: Int) = when {
-                pageable == null -> 0 to 0
-                pageSize <= 0 -> 0 to 0
-                pageable.position != null -> pageable.position / pageSize to pageable.position
-                else -> pageable.page to pageable.page * pageSize
-            }
+            val (pageIndex: Int, positionIndex: Int) = determineIndexes(pageable = pageable, pageSize = pageSize)
 
             // Adjust pagination state based on total pages and content availability.
             val elementsInPage: Int = content.size
@@ -88,13 +79,13 @@ public data class Page<out T : Any>(
             val hasPrevious: Boolean = (pageIndex > 0) && (totalPages > 0)
 
             // True if the requested page or position exceeds the available elements.
-            val isOverflow: Boolean = when {
-                pageable?.position != null ->
-                    (totalElements in 1..positionIndex) || (totalElements <= 0 && positionIndex > 0)
-
-                else ->
-                    (totalPages in 1..pageIndex) || (totalPages <= 0 && pageIndex > 0)
-            }
+            val isOverflow: Boolean = checkOverflow(
+                pageable = pageable,
+                totalElements = totalElements,
+                totalPages = totalPages,
+                pageIndex = pageIndex,
+                positionIndex = positionIndex
+            )
 
             // Construct the Page object with the determined states.
             return Page(
@@ -114,6 +105,77 @@ public data class Page<out T : Any>(
                 ),
                 content = content
             )
+        }
+
+        /**
+         * Resolves the effective page size based on the requested pageable.
+         *
+         * @param pageable The pagination request.
+         * @param totalElements The total number of elements available.
+         * @return A valid page size greater than zero, or defaults to [totalElements].
+         */
+        private fun resolvePageSize(pageable: Pageable?, totalElements: Int): Int {
+            val requested: Int? = pageable?.size
+            return if (requested != null && requested > 0) {
+                requested
+            } else {
+                totalElements
+            }
+        }
+
+        /**
+         * Calculates the total number of pages.
+         *
+         * @param totalElements The total number of elements available.
+         * @param pageSize The number of elements per page.
+         * @return Total pages, or 0 if no elements are available.
+         */
+        private fun calculateTotalPages(totalElements: Int, pageSize: Int): Int {
+            return if (totalElements > 0 && pageSize > 0) {
+                ((totalElements + pageSize - 1) / pageSize).coerceAtLeast(minimumValue = 1)
+            } else {
+                0
+            }
+        }
+
+        /**
+         * Determines the page index and absolute position index based on the pageable request.
+         *
+         * @param pageable The pagination request.
+         * @param pageSize The number of elements per page.
+         * @return A pair of (pageIndex, positionIndex).
+         */
+        private fun determineIndexes(pageable: Pageable?, pageSize: Int): Pair<Int, Int> {
+            return when {
+                pageable == null -> 0 to 0
+                pageSize <= 0 -> 0 to 0
+                pageable.position != null -> (pageable.position / pageSize) to pageable.position
+                else -> pageable.page to (pageable.page * pageSize)
+            }
+        }
+
+        /**
+         * Checks whether the requested page or position exceeds the available elements.
+         *
+         * @param pageable The pagination request.
+         * @param totalElements The total number of elements available.
+         * @param totalPages The total number of pages.
+         * @param pageIndex The current page index.
+         * @param positionIndex The absolute position index.
+         * @return True if the request exceeds available elements, false otherwise.
+         */
+        private fun checkOverflow(
+            pageable: Pageable?,
+            totalElements: Int,
+            totalPages: Int,
+            pageIndex: Int,
+            positionIndex: Int
+        ): Boolean {
+            return if (pageable?.position != null) {
+                (totalElements in 1..positionIndex) || (totalElements <= 0 && positionIndex > 0)
+            } else {
+                (totalPages in 1..pageIndex) || (totalPages <= 0 && pageIndex > 0)
+            }
         }
 
         /**

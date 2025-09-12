@@ -64,7 +64,9 @@ public fun ApplicationCall.getPageable(): Pageable? {
     // Validate combinations: require (page & size) together OR (position & size) together, not both.
     val pagePair: Boolean = (pageIndex != null) && (pageSize != null)
     val positionPair: Boolean = (positionIndex != null) && (pageSize != null)
-    if ((pagePair && positionPair) || (!pagePair && !positionPair && pageSize != null)) {
+    val bothPairsPresent: Boolean = pagePair && positionPair
+    val noPairsButSizePresent: Boolean = !pagePair && !positionPair && (pageSize != null)
+    if (bothPairsPresent || noPairsButSizePresent) {
         throw PaginationError.InvalidPageablePair()
     }
 

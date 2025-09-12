@@ -4,8 +4,8 @@
 
 package io.perracodex.exposed.pagination
 
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.Parameters
+import io.ktor.server.application.ApplicationCall
 import io.perracodex.exposed.utils.PageableKeys
 import io.perracodex.exposed.utils.SortParameterParser
 
@@ -15,10 +15,11 @@ import io.perracodex.exposed.utils.SortParameterParser
  * **Pagination Parameters:**
  * - **`page`**: The zero-based index of the requested page.
  * - **`size`**: The number of elements per page. `0` if all elements should be returned without pagination.
- * - **`position`**: The zero-based index of the requested element.
+ * - **`position`**: The zero-based index (absolute position) of the requested element.
  *
  * Rules:
- * - You must provide either `page` and `size`, or `position` and `size`, or none. Do not provide both `page` and `position`.
+ * - You must provide either `page` and `size`, or `position` and `size`, or none.
+ *   Do not provide both `page` and `position`.
  *
  * **Sorting Parameters:**
  * - **`sort`**: A list of strings defining the sorting criteria. Format `"fieldName,direction"`, where:
@@ -61,8 +62,8 @@ public fun ApplicationCall.getPageable(): Pageable? {
     val positionIndex: Int? = parameters[PageableKeys.POSITION.key]?.toIntOrNull()
 
     // Validate combinations: require (page & size) together OR (position & size) together, not both.
-    val pagePair = pageIndex != null && pageSize != null
-    val positionPair = positionIndex != null && pageSize != null
+    val pagePair: Boolean = (pageIndex != null) && (pageSize != null)
+    val positionPair: Boolean = (positionIndex != null) && (pageSize != null)
     if ((pagePair && positionPair) || (!pagePair && !positionPair && pageSize != null)) {
         throw PaginationError.InvalidPageablePair()
     }
@@ -71,7 +72,7 @@ public fun ApplicationCall.getPageable(): Pageable? {
     val sortParameters: List<String>? = parameters.getAll(name = PageableKeys.SORT.key)
 
     // If no parameters are provided, means no pagination is requested.
-    if (pageIndex == null && positionIndex == null && sortParameters.isNullOrEmpty()) {
+    if ((pageIndex == null) && (positionIndex == null) && sortParameters.isNullOrEmpty()) {
         return null
     }
 

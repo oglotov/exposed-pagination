@@ -41,7 +41,7 @@ public sealed class PaginationError(
      */
     public class InvalidPageablePair : PaginationError(
         errorCode = "INVALID_PAGEABLE_PAIR",
-        description = "Page attributes mismatch. Expected both 'page' and 'size', or none of them.",
+        description = "Page attributes mismatch. Use either 'page'+'size' or 'position'+'size' (mutually exclusive), or none.",
     )
 
     /**

@@ -12,6 +12,9 @@ internal enum class PageableKeys(val key: String) {
     /** The query parameter key for the page index. */
     PAGE("page"),
 
+    /** The query parameter key for the absolute starting position (offset). */
+    POSITION("position"),
+
     /** The query parameter key for the page size. */
     SIZE("size"),
 
